@@ -1,0 +1,25 @@
+# Dependencies
+**/node_modules
+
+# Next.js
+**/.next
+
+# NestJS
+**/dist
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.*
+
+# Coverage
+coverage
+
+# OS
+.DS_Store
+
+# AI agents
+AGENTS.md
+CLAUDE.md
