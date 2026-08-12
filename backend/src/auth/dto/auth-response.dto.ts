@@ -9,3 +9,8 @@ export const AuthResponseSchema = z.object({
 });
 
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;
+
+export const UserResponseSchema = AuthResponseSchema.omit({
+  accessToken: true,
+});
+export type UserResponse = z.infer<typeof UserResponseSchema>;
