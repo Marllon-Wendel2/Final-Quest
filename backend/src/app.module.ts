@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { MissionModule } from './mission/mission.module';
+import { PlayerMissionModule } from './player-mission/player-mission.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MissionModule } from './mission/mission.module';
     }),
     UserModule,
     MissionModule,
+    PlayerMissionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
