@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import AuthForm from './components/AuthForm';
 import MissionsList from './components/MissionsList';
+import RankingList from './components/RankingList';
 import { logout } from '../api/auth';
 import { getMe, User } from '../api/client';
 import './globals.css';
@@ -117,6 +118,10 @@ export default function Home() {
         </header>
 
         <MissionsList onMissionComplete={() => getMe().then(setUser)} />
+
+        <div style={{ marginTop: '2rem' }}>
+          <RankingList />
+        </div>
       </div>
     </main>
   );
