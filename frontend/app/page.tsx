@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import AuthForm from './components/AuthForm';
+import MissionsList from './components/MissionsList';
 import { logout } from '../api/auth';
 import { getMe, User } from '../api/client';
 import './globals.css';
@@ -115,21 +116,7 @@ export default function Home() {
           </div>
         </header>
 
-        <div
-          style={{
-            background: 'linear-gradient(135deg, var(--parchment) 0%, var(--parchment-dark) 100%)',
-            border: '3px solid var(--gold-dark)',
-            boxShadow: '4px 4px 0 var(--parchment-dark)',
-            padding: '1.5rem',
-          }}
-        >
-          <h2 style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.85rem', color: 'var(--gold)', marginBottom: '1rem' }}>
-            Missoes
-          </h2>
-          <p style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.6rem', color: 'var(--text-dim)', lineHeight: 1.8 }}>
-            Suas missoes aparecerao aqui em breve...
-          </p>
-        </div>
+        <MissionsList onMissionComplete={() => getMe().then(setUser)} />
       </div>
     </main>
   );
