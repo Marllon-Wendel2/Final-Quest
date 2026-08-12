@@ -1,26 +1,396 @@
 @import "tailwindcss";
 
+/* ========================================
+   FINAL QUEST - Custom RPG Pixel Art CSS
+   ======================================== */
+
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('https://fonts.gstatic.com/s/pressstart2p/v15/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --gold: #f7d060;
+  --gold-bright: #ffe066;
+  --gold-dark: #c9a84c;
+  --parchment: #3d2b1f;
+  --parchment-light: #5c3d2e;
+  --parchment-dark: #2a1a10;
+  --bg-dark: #0a0a1a;
+  --bg-card: #1a1225;
+  --input-bg: #0d0d1a;
+  --input-border: #8b7355;
+  --btn-green: #2d5a27;
+  --btn-green-hover: #3a7a32;
+  --btn-blue: #1a3a6a;
+  --btn-blue-hover: #2a4a7a;
+  --text-white: #f0e6d3;
+  --text-dim: #a89880;
+  --error-red: #cc3333;
+  --error-bg: #1a0a0a;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: var(--bg-dark);
+  color: var(--text-white);
+  font-family: 'Press Start 2P', monospace;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  image-rendering: pixelated;
+}
+
+/* ========================================
+   STARFIELD BACKGROUND
+   ======================================== */
+
+.starfield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background:
+    radial-gradient(1px 1px at 10% 20%, #ffffff 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 45%, #ffffff 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 15%, #ffffff 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 60%, #ffffff 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 30%, #ffffff 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 55%, #ffffff 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 70%, #ffffff 0%, transparent 100%),
+    radial-gradient(1px 1px at 35% 85%, #ffffff 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 40%, #ffffff 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 75%, #ffffff 0%, transparent 100%),
+    radial-gradient(1px 1px at 5% 50%, #ffffff 0%, transparent 100%),
+    radial-gradient(1px 1px at 45% 5%, #ffffff 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 10%, #ffffff 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 90%, #ffffff 0%, transparent 100%),
+    radial-gradient(1px 1px at 20% 95%, #ffffff 0%, transparent 100%),
+    radial-gradient(2px 2px at 30% 35%, #f7d060 0%, transparent 100%),
+    radial-gradient(2px 2px at 65% 20%, #f7d060 0%, transparent 100%),
+    radial-gradient(2px 2px at 75% 80%, #f7d060 0%, transparent 100%),
+    linear-gradient(180deg, #0a0a1a 0%, #0f0f2a 50%, #1a1030 100%);
+}
+
+/* ========================================
+   RPG CARD (Login/Register)
+   ======================================== */
+
+.rpg-card {
+  position: relative;
+  width: 100%;
+  max-width: 26rem;
+  background:
+    linear-gradient(135deg, var(--parchment) 0%, var(--parchment-dark) 100%);
+  border: 4px solid var(--gold);
+  box-shadow:
+    0 0 0 2px var(--parchment-dark),
+    0 0 0 6px var(--gold-dark),
+    0 0 20px rgba(247, 208, 96, 0.15),
+    inset 0 0 30px rgba(0, 0, 0, 0.3);
+  padding: 2rem 1.5rem;
+}
+
+.rpg-card::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  bottom: 4px;
+  border: 2px solid var(--gold-dark);
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* Corner decorations */
+.rpg-card::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border: 2px solid var(--gold-dark);
+  pointer-events: none;
+  opacity: 0.2;
+}
+
+/* ========================================
+   RPG TITLE
+   ======================================== */
+
+.rpg-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.1rem;
+  color: var(--gold-bright);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-shadow:
+    2px 2px 0 var(--parchment-dark),
+    0 0 10px rgba(247, 208, 96, 0.3);
+  letter-spacing: 2px;
+}
+
+/* ========================================
+   RPG TOGGLE BUTTONS (Login/Cadastro)
+   ======================================== */
+
+.rpg-toggle-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.rpg-toggle-btn {
+  flex: 1;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  padding: 0.75rem 0.5rem;
+  cursor: pointer;
+  border: 3px solid var(--gold-dark);
+  background: var(--btn-blue);
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.1s;
+  box-shadow:
+    4px 4px 0 var(--parchment-dark),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.rpg-toggle-btn:hover {
+  background: var(--btn-blue-hover);
+  color: var(--text-white);
+}
+
+.rpg-toggle-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow:
+    2px 2px 0 var(--parchment-dark),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.rpg-toggle-btn.active {
+  background: var(--btn-blue-hover);
+  color: var(--gold-bright);
+  border-color: var(--gold);
+  box-shadow:
+    4px 4px 0 var(--parchment-dark),
+    0 0 12px rgba(247, 208, 96, 0.25),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
+   RPG FORM FIELDS
+   ======================================== */
+
+.rpg-field {
+  margin-bottom: 1rem;
+}
+
+.rpg-label {
+  display: block;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.rpg-input {
+  width: 100%;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  padding: 0.75rem;
+  background: var(--input-bg);
+  color: var(--text-white);
+  border: 2px solid var(--input-border);
+  outline: none;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(139, 115, 85, 0.2);
+  transition: border-color 0.15s;
+}
+
+.rpg-input::placeholder {
+  color: var(--text-dim);
+  opacity: 0.5;
+}
+
+.rpg-input:focus {
+  border-color: var(--gold);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 8px rgba(247, 208, 96, 0.2);
+}
+
+/* ========================================
+   RPG SUBMIT BUTTON (Green)
+   ======================================== */
+
+.rpg-submit-btn {
+  width: 100%;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+  border: 3px solid var(--gold);
+  background: var(--btn-green);
+  color: var(--gold-bright);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  box-shadow:
+    4px 4px 0 var(--parchment-dark),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.3);
+  transition: all 0.1s;
+}
+
+.rpg-submit-btn:hover:not(:disabled) {
+  background: var(--btn-green-hover);
+  box-shadow:
+    4px 4px 0 var(--parchment-dark),
+    0 0 15px rgba(247, 208, 96, 0.2),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.3);
+}
+
+.rpg-submit-btn:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow:
+    2px 2px 0 var(--parchment-dark),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.3);
+}
+
+.rpg-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   RPG ERROR BALLOON
+   ======================================== */
+
+.rpg-error {
+  position: relative;
+  background: var(--error-bg);
+  border: 2px solid var(--error-red);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rpg-error::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid var(--error-red);
+}
+
+.rpg-error-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: #ff6b6b;
+  line-height: 1.6;
+}
+
+/* ========================================
+   DASHBOARD HEADER
+   ======================================== */
+
+.rpg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, var(--parchment) 0%, var(--parchment-dark) 100%);
+  border: 3px solid var(--gold-dark);
+  box-shadow: 4px 4px 0 var(--parchment-dark);
+}
+
+.rpg-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--gold);
+  color: var(--parchment-dark);
+  border: 2px solid var(--gold-dark);
+}
+
+.rpg-logout-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border: 2px solid var(--error-red);
+  background: transparent;
+  color: var(--error-red);
+  text-transform: uppercase;
+  transition: all 0.1s;
+  box-shadow: 3px 3px 0 var(--parchment-dark);
+}
+
+.rpg-logout-btn:hover {
+  background: var(--error-red);
+  color: white;
+}
+
+.rpg-logout-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--parchment-dark);
+}
+
+/* ========================================
+   PIXEL ICONS (inline SVG via CSS)
+   ======================================== */
+
+.icon-key::before {
+  content: '🗝';
+  font-style: normal;
+}
+
+.icon-ghost::before {
+  content: '👻';
+  font-style: normal;
+}
+
+/* ========================================
+   SCROLLBAR (optional RPG feel)
+   ======================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold-dark);
+  border: 1px solid var(--parchment-dark);
 }
