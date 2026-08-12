@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String          @unique
+  name         String
+  hashPassword String          @map("hash_password")
+  points       Int             @default(0)
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  missions     PlayerMission[]
+
+  @@map("users")
+}
+
+model Mission {
+  id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  description String
+  points      Int
+  createdAt   DateTime        @default(now()) @map("created_at")
+  players     PlayerMission[]
+
+  @@map("missions")
+}
+
+model PlayerMission {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  missionId   String   @map("mission_id") @db.Uuid
+  completedAt DateTime @default(now()) @map("completed_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, missionId])
+  @@map("player_missions")
+}
