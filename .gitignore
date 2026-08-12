@@ -23,3 +23,7 @@ coverage
 # AI agents
 AGENTS.md
 CLAUDE.md
+
+.agents
+.claude
+.windsurf
