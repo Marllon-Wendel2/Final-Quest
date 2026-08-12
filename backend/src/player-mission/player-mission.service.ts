@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -12,6 +12,16 @@ export class PlayerMissionService {
 
     if (!mission) {
       throw new NotFoundException('Missão não encontrada');
+    }
+
+    const existingCompletion = await this.prismaService.playerMission.findUnique({
+      where: {
+        userId_missionId: { userId, missionId },
+      },
+    });
+
+    if (existingCompletion) {
+      throw new ConflictException('Missão já completada');
     }
 
     try {
@@ -30,6 +40,9 @@ export class PlayerMissionService {
         return playerMission;
       });
     } catch (error) {
+      if (error.code === 'P2002') {
+        throw new ConflictException('Missão já completada');
+      }
       console.error(error);
       throw new Error('Erro ao completar a missão');
     }
