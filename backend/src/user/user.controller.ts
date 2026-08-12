@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Put,
+  Query,
   Req,
   UseGuards,
   Delete,
@@ -26,6 +27,13 @@ export class UserController {
   @Roles('ADMIN')
   getAllUsers() {
     return this.userService.getAllUsers();
+  }
+
+  @Get('ranked')
+  getRankedUsers(@Query('limit') limit?: string) {
+    const parsedLimit = limit ? parseInt(limit, 10) : 10;
+    const validLimit = [10, 20, 50].includes(parsedLimit) ? parsedLimit : 10;
+    return this.userService.getRankedUsers(validLimit);
   }
 
   @Get(':id')

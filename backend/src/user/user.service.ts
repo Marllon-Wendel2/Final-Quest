@@ -71,4 +71,24 @@ export class UserService {
       }
     }
   }
+
+  async getRankedUsers(limit?: number) {
+    try {
+      const users = await this.prismaService.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          points: true,
+        },
+        orderBy: {
+          points: 'desc',
+        },
+        take: limit,
+      });
+      return users;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Erro ao buscar usuários');
+    }
+  }
 }
