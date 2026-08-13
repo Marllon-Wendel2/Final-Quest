@@ -79,6 +79,12 @@ body {
     radial-gradient(2px 2px at 65% 20%, #f7d060 0%, transparent 100%),
     radial-gradient(2px 2px at 75% 80%, #f7d060 0%, transparent 100%),
     linear-gradient(180deg, #0a0a1a 0%, #0f0f2a 50%, #1a1030 100%);
+  animation: starfieldPulse 4s ease-in-out infinite;
+}
+
+@keyframes starfieldPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
 }
 
 /* ========================================
@@ -393,4 +399,76 @@ body {
 ::-webkit-scrollbar-thumb {
   background: var(--gold-dark);
   border: 1px solid var(--parchment-dark);
+}
+
+@keyframes missionComplete {
+  0% {
+    box-shadow: 0 0 0 0 rgba(247, 208, 96, 0);
+    border-color: var(--gold-dark);
+  }
+  25% {
+    box-shadow: 0 0 20px 5px rgba(247, 208, 96, 0.5);
+    border-color: var(--gold-bright);
+  }
+  50% {
+    box-shadow: 0 0 30px 10px rgba(247, 208, 96, 0.7);
+    border-color: #ffd700;
+  }
+  75% {
+    box-shadow: 0 0 20px 5px rgba(247, 208, 96, 0.5);
+    border-color: var(--gold);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(247, 208, 96, 0);
+    border-color: var(--gold);
+  }
+}
+
+@keyframes missionColorFlash {
+  0% { background: var(--parchment-dark); }
+  20% { background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(212, 175, 55, 0.2) 100%); }
+  40% { background: linear-gradient(135deg, rgba(255, 165, 0, 0.3) 0%, rgba(212, 175, 55, 0.2) 100%); }
+  60% { background: linear-gradient(135deg, rgba(255, 215, 0, 0.25) 0%, rgba(212, 175, 55, 0.15) 100%); }
+  80% { background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, var(--parchment-dark) 100%); }
+  100% { background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, var(--parchment-dark) 100%); }
+}
+
+.mission-just-completed {
+  animation: missionComplete 0.8s ease-out, missionColorFlash 1s ease-out;
+}
+
+@keyframes floatingPoints {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-40px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(0.8);
+  }
+}
+
+.floating-points {
+  position: absolute;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.8rem;
+  color: var(--gold-bright);
+  text-shadow: 2px 2px 0 var(--parchment-dark), 0 0 10px rgba(247, 208, 96, 0.8);
+  pointer-events: none;
+  animation: floatingPoints 1.2s ease-out forwards;
+  z-index: 100;
+}
+
+@keyframes headerPointsPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); color: #ffd700; }
+  100% { transform: scale(1); }
+}
+
+.header-points-pop {
+  animation: headerPointsPop 0.4s ease-out;
 }

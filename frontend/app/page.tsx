@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import AuthForm from './components/AuthForm';
 import MissionsList from './components/MissionsList';
@@ -12,6 +12,8 @@ import './globals.css';
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pointsAnimating, setPointsAnimating] = useState(false);
+  const prevPointsRef = useRef<number | null>(null);
 
   useEffect(() => {
     getMe().then((userData) => {
@@ -19,6 +21,16 @@ export default function Home() {
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    if (user && prevPointsRef.current !== null && user.points > prevPointsRef.current) {
+      setPointsAnimating(true);
+      setTimeout(() => setPointsAnimating(false), 400);
+    }
+    if (user) {
+      prevPointsRef.current = user.points;
+    }
+  }, [user]);
 
   const handleLogin = (newUser: User) => {
     setUser(newUser);
@@ -110,7 +122,7 @@ export default function Home() {
             <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.65rem', color: 'var(--text-white)' }}>
               Ola, {user.name}
             </span>
-            <span className="rpg-badge">{user.points} pts</span>
+            <span className={`rpg-badge ${pointsAnimating ? 'header-points-pop' : ''}`}>{user.points} pts</span>
             <button onClick={handleLogout} className="rpg-logout-btn">
               Sair
             </button>
