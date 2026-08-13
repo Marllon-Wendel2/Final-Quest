@@ -12,7 +12,6 @@
 
 # Environment
 .env
-.env.*
 
 # Coverage
 coverage

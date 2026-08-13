@@ -11,11 +11,17 @@ Sistema de missões gamificadas com autenticação, ranking e interface retro 8-
 ### 1. Clonar e configurar
 
 ```bash
-git clone <https://github.com/Marllon-Wendel2/Final-Quest.git> final-quest
-cd final-quest
+git clone https://github.com/Marllon-Wendel2/Final-Quest.git
+cd Final-Quest
 ```
 
-O arquivo `.env` já vem configurado com as variáveis padrão (PostgreSQL, JWT secret, etc).
+Copie os arquivos de exemplo e ajuste as variáveis conforme necessário:
+
+```bash
+cp .env.example .env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
 
 ### 2. Subir tudo com um comando
 
