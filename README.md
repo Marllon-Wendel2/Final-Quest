@@ -2,74 +2,154 @@
 
 Sistema de missões gamificadas com autenticação, ranking e interface retro 8-bits.
 
-## Como Rodar
+## Como Rodar do Zero
 
 ### Pré-requisitos
+
 - Docker e Docker Compose
-- Node.js 22+
-- npm
 
-### 1. Subir o banco de dados
+### 1. Clonar e configurar
 
 ```bash
-docker compose up -d
+git clone <https://github.com/Marllon-Wendel2/Final-Quest.git> final-quest
+cd final-quest
 ```
 
-O PostgreSQL fica disponível na porta **5433**.
+O arquivo `.env` já vem configurado com as variáveis padrão (PostgreSQL, JWT secret, etc).
 
-### 2. Backend
+### 2. Subir tudo com um comando
 
 ```bash
-cd backend
-npm install
-npx prisma migrate dev
-npm run start:dev
+docker compose up --build
 ```
 
-O backend roda em `http://localhost:3001`.
+Isso sobe 4 serviços automaticamente:
 
-### 3. Frontend
+| Serviço | URL | Descrição |
+|---------|-----|-----------|
+| **Frontend** | `http://localhost:3001` | Interface Next.js |
+| **Backend** | `http://localhost:3000` | API NestJS |
+| **Prisma Studio** | `http://localhost:5555` | UI de gerenciamento do banco |
+| **PostgreSQL** | `localhost:5433` | Banco de dados |
+
+> **⚠️ Conflito de portas:** Se alguma dessas portas já estiver em uso, o Docker vai falhar ao iniciar o container correspondente. Para resolver:
+> ```bash
+> # Verificar o que está usando a porta
+> lsof -i :3000
+>
+> # Matar o processo (substitua <PID>)
+> kill <PID>
+> ```
+> Ou altere as portas no `docker-compose.yml` (lado esquerdo dos `ports`):
+> ```yaml
+> ports:
+>   - "3010:3000"  # usa 3010 no host em vez de 3000
+> ```
+
+O backend executa automaticamente:
+1. Aguarda o PostgreSQL estar saudável (`healthcheck`)
+2. Gera o Prisma Client
+3. Aplica migrations pendentes
+4. Cria as 5 missões iniciais (seed)
+
+### 3. Acessar
+
+- Abra `http://localhost:3001` no navegador
+- Registre uma conta e comece a completar missões
+
+### Comandos úteis
 
 ```bash
-cd frontend
-npm install
-npm run dev
+# Ver logs de todos os serviços
+docker compose logs -f
+
+# Ver logs de um serviço específico
+docker compose logs -f backend
+
+# Parar tudo
+docker compose down
+
+# Parar e apagar dados (volume do banco)
+docker compose down -v
+
+# Reconstruir um serviço específico
+docker compose up --build backend
 ```
 
-O frontend roda em `http://localhost:3000`.
+---
 
-### Seed
+## Decisões Técnicas e Por quê
 
-As missões são criadas automaticamente ao iniciar o backend (5 missões pré-definidas).
-
-## Decisões Técnicas
+### Arquitetura
 
 | Camada | Tecnologia | Motivo |
 |--------|-----------|--------|
-| Backend | NestJS | Modularização, arquitetura limpa e experiência prévia |
-| Frontend | Next.js | Performance, rotas facilitadas e experiência prévia |
-| Banco | PostgreSQL + Prisma | Requisitos simples, Prisma oferece legibilidade e type-safety |
-| UI | NES.css + estética 8-bits | Visual retro conhecido, AI auxilia na estética, foco em segurança e testes |
-| Auth | JWT + bcrypt + httpOnly cookies | Segurança: token não expõe ao frontend, hash protege senhas |
-| Validação | Zod | Type-safety com TypeScript, validação declarativa |
+| Backend | NestJS | Arquitetura modular com dependency injection, separação clara de concerns, decorator-based |
+| Frontend | Next.js | SSR/SSG, rotas por arquivo, otimizações de build, ecossistema React |
+| Banco | PostgreSQL + Prisma | Type-safety em queries, migrations versionadas,DX superior ao SQL raw |
+| UI | NES.css + Press Start 2P | Estética 8-bit coesa, o CSS fornece componentes base e a tipografia Pixel completa o visual |
+| Auth | JWT + bcrypt + httpOnly cookies | Token não expõe ao frontend (XSS), bcrypt com salt, cookies httpOnly para storage seguro |
+| Validação | Zod | Validação declarativa com inferência de tipos TypeScript, sem duplicação de schemas |
 
-## O que ficou de fora
+### Docker Compose
 
-- **Testes automatizados:** Sem tempo para implementar testes unitários e e2e
-- **CI/CD:** Pipeline de deploy não configurado
-- **Rate limiting:** Não implementado contra ataques de força bruta
-- **Fila de requisições:** Race conditions tratadas via constraint do banco + tratamento de erro, mas fila (Bull/Redis) seria mais robusto
-- **Recuperação de senha:** Fluxo de reset não implementado
-- **Notificações:** Sem sistema de notificação em tempo real
+- **Entrypoint script** no backend: aguarda DB, gera Prisma Client, roda migrations e inicia o app — evita dependência de scripts externos ou ordem manual de execução
+- **Healthcheck no PostgreSQL**: o backend só inicia quando o DB está realmente aceitando conexões, não apenas quando o container existe
+- **Prisma Studio como serviço**: permite inspecionar e manipular dados diretamente via UI web, útil para debug e validação durante desenvolvimento
+- **Variáveis de ambiente via `.env`**: separação de configuração do código, facilita uso local e em CI/CD
 
-## O que faria com mais prazo
+### Backend
 
-- Testes unitários e e2e com Jest + Supertest
-- CI/CD com GitHub Actions
-- Rate limiting com @nestjs/throttler
-- Fila Bull + Redis para requisições concorrentes
-- Recuperação de senha via email
-- WebSocket para atualizações em tempo real no ranking
-- Página de perfil do jogador com histórico de missões
-- Sistema de conquistas/badges
-- Paginação na listagem de missões e ranking
+- **Prisma Adapter (Pg)**: conexão via Pool do `pg` em vez do driver padrão do Prisma, suporta connection pooling nativo
+- **Seed via `OnModuleInit`**: missões iniciais são criadas automaticamente se a tabela estiver vazia — sem script separado, sem passo manual
+- **CORS configurado**: origens explícitas, credenciais habilitadas para cookies httpOnly
+- **WebSocket (Socket.IO)**: ranking em tempo real via gateway NestJS, notificações quando jogadores completam missões
+
+### Frontend
+
+- **API client com interceptors**: tratamento centralizado de erros, base URL configurável via `NEXT_PUBLIC_API_URL`
+- **Estado local com React hooks**: `useState` + `useRef` para controle de animações e dados do usuário, sem necessidade de estado global para uma tela
+
+---
+
+## O que Ficou de Fora (por tempo)
+
+- **Testes automatizados**: backend e frontend sem cobertura de testes unitários e e2e
+- **CI/CD**: pipeline de build, lint e deploy não configurado
+- **Rate limiting**: nenhum contra-ataque de força bruta ou abuso de API
+- **Fila de requisições**: concorrência tratada via constraint do banco (`@@unique`) + tratamento de erro, mas sem fila dedicada
+- **Recuperação de senha**: fluxo de reset não implementado
+- **Paginação**: listagem de missões e ranking carregam todos os registros
+- **Documentação da API**: sem Swagger/OpenAPI configurado
+- **Logs estruturados**: logs em texto plano, sem formato JSON para ferramentas de observabilidade
+
+---
+
+## O que Faria com Mais Prazo
+
+**Testes e Qualidade**
+- Testes unitários com Jest + mocks do Prisma
+- Testes e2e com Supertest cobrindo fluxos de auth, missões e ranking
+- Linting automatizado no CI (ESLint + Prettier)
+- Coverage mínimo obrigatório
+
+**Infraestrutura e DevOps**
+- CI/CD com GitHub Actions (build → test → deploy)
+- Docker multi-stage builds para imagens menores
+- Rate limiting com `@nestjs/throttler`
+- Logs estruturados com pino ou Winston
+- Health checks no backend (`/health` endpoint)
+
+**Funcionalidades**
+- Fila Bull + Redis para processamento assíncrono de missões concorrentes
+- Paginação e busca em missões e ranking
+- Recuperação de senha via email (Nodemailer + tokens temporários)
+- Sistema de conquistas/badges além dos pontos
+- Página de perfil com histórico completo de missões
+- Notificações push no frontend via WebSocket
+
+**Segurança**
+- Helmet para headers HTTP de segurança
+- CSRF protection além dos cookies
+- Validação de input em todos os endpoints
+- Auditoria de ações (log dewho fez o quê e quando)

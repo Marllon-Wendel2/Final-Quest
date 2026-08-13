@@ -1,5 +1,7 @@
 FROM node:22-alpine
 
+RUN apk add --no-cache postgresql-client
+
 WORKDIR /app
 
 COPY package*.json ./
@@ -8,6 +10,8 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 3001
+RUN chmod +x entrypoint.sh
 
-CMD ["npm", "run", "start:dev"]
+EXPOSE 3000
+
+ENTRYPOINT ["./entrypoint.sh"]
