@@ -331,11 +331,45 @@ body {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.5rem 1rem;
   padding: 1rem 1.5rem;
   background: linear-gradient(135deg, var(--parchment) 0%, var(--parchment-dark) 100%);
   border: 3px solid var(--gold-dark);
   box-shadow: 4px 4px 0 var(--parchment-dark);
+}
+
+@media (max-width: 640px) {
+  .rpg-header {
+    justify-content: center;
+    gap: 0.4rem 1rem;
+    padding: 0.75rem 0.75rem;
+  }
+  .rpg-header > div {
+    justify-content: center;
+  }
+  .rpg-header img {
+    width: 120px;
+    height: auto;
+    flex-shrink: 0;
+  }
+  .header-greeting {
+    font-size: 0.5rem !important;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .header-badge {
+    font-size: 0.45rem;
+    padding: 0.25rem 0.4rem;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .header-logout {
+    font-size: 0.45rem;
+    padding: 0.3rem 0.5rem;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
 }
 
 .rpg-badge {

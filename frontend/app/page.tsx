@@ -111,19 +111,21 @@ export default function Home() {
       <div className="starfield" />
       <div style={{ maxWidth: '56rem', margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <header className="rpg-header" style={{ marginBottom: '2rem' }}>
-          <Image
-            src="/logoFinalQuestWithNoteBackground.png"
-            alt="Final Quest"
-            width={150}
-            height={60}
-            style={{ height: 'auto', imageRendering: 'auto' }}
-          />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-            <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.65rem', color: 'var(--text-white)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <Image
+              src="/logoFinalQuestWithNoteBackground.png"
+              alt="Final Quest"
+              width={150}
+              height={60}
+              style={{ height: 'auto', imageRendering: 'auto', flexShrink: 0 }}
+            />
+            <span className="header-greeting" style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.65rem', color: 'var(--text-white)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
               Ola, {user.name}
             </span>
-            <span className={`rpg-badge ${pointsAnimating ? 'header-points-pop' : ''}`}>{user.points} pts</span>
-            <button onClick={handleLogout} className="rpg-logout-btn">
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <span className={`rpg-badge header-badge ${pointsAnimating ? 'header-points-pop' : ''}`}>{user.points} pts</span>
+            <button onClick={handleLogout} className="rpg-logout-btn header-logout">
               Sair
             </button>
           </div>
