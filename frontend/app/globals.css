@@ -472,3 +472,34 @@ body {
 .header-points-pop {
   animation: headerPointsPop 0.4s ease-out;
 }
+
+@keyframes rankingPositionChanged {
+  0% {
+    transform: translateX(0);
+    box-shadow: 0 0 0 0 rgba(247, 208, 96, 0);
+  }
+  20% {
+    transform: translateX(-8px);
+    box-shadow: -4px 0 15px rgba(247, 208, 96, 0.4);
+  }
+  40% {
+    transform: translateX(8px);
+    box-shadow: 4px 0 15px rgba(247, 208, 96, 0.4);
+  }
+  60% {
+    transform: translateX(-4px);
+    box-shadow: -2px 0 10px rgba(247, 208, 96, 0.3);
+  }
+  80% {
+    transform: translateX(4px);
+    box-shadow: 2px 0 10px rgba(247, 208, 96, 0.3);
+  }
+  100% {
+    transform: translateX(0);
+    box-shadow: 0 0 0 0 rgba(247, 208, 96, 0);
+  }
+}
+
+.ranking-position-changed {
+  animation: rankingPositionChanged 0.6s ease-out;
+}
