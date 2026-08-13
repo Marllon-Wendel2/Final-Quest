@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/unbound-method, @typescript-eslint/no-unsafe-assignment */
-import { ConflictException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerMissionService } from './player-mission.service';
 import { createPrismaMock, PrismaMock } from 'src/test/prisma.mock';
@@ -28,75 +28,128 @@ describe('PlayerMissionService', () => {
     service = module.get<PlayerMissionService>(PlayerMissionService);
   });
 
-  it('deve completar uma missão com sucesso', async () => {
-    const mission = makeMission({ points: 50 });
-    const userId = 'user-id-001';
+  describe('completeMission', () => {
+    it('deve completar uma missão com sucesso', async () => {
+      const mission = makeMission({ points: 50 });
+      const userId = 'user-id-001';
 
-    prisma.mission.findUnique.mockResolvedValue(mission);
-    prisma.playerMission.findUnique.mockResolvedValue(null);
+      prisma.mission.findUnique.mockResolvedValue(mission);
+      prisma.playerMission.findUnique.mockResolvedValue(null);
 
-    const result = await service.completeMission(userId, mission.id);
+      const result = await service.completeMission(userId, mission.id);
 
-    expect(prisma.$transaction).toHaveBeenCalled();
-    expect(rankingGateway.broadcastUpdate).toHaveBeenCalledTimes(1);
-    expect(result).toBeDefined();
-    expect(result).toHaveProperty('id');
+      expect(prisma.$transaction).toHaveBeenCalled();
+      expect(rankingGateway.broadcastUpdate).toHaveBeenCalledTimes(1);
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('id');
+    });
+
+    it('deve lançar NotFoundException se missão não existir', async () => {
+      prisma.mission.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.completeMission('user-id', 'nonexistent-id'),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('deve lançar ConflictException se missão já completada', async () => {
+      const mission = makeMission();
+      const existing = makePlayerMission();
+
+      prisma.mission.findUnique.mockResolvedValue(mission);
+      prisma.playerMission.findUnique.mockResolvedValue(existing);
+
+      await expect(
+        service.completeMission('user-id', mission.id),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('deve chamar rankingGateway.broadcastUpdate após sucesso', async () => {
+      const mission = makeMission();
+
+      prisma.mission.findUnique.mockResolvedValue(mission);
+      prisma.playerMission.findUnique.mockResolvedValue(null);
+      prisma.user.update.mockResolvedValue(makeUser());
+
+      await service.completeMission('user-id', mission.id);
+
+      expect(rankingGateway.broadcastUpdate).toHaveBeenCalledTimes(1);
+    });
+
+    it('deve tratar erro P2002 como ConflictException', async () => {
+      const mission = makeMission();
+
+      prisma.mission.findUnique.mockResolvedValue(mission);
+      prisma.playerMission.findUnique.mockResolvedValue(null);
+
+      prisma.$transaction.mockRejectedValueOnce({ code: 'P2002' });
+
+      await expect(
+        service.completeMission('user-id', mission.id),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('deve lançar Error genérico para erros inesperados na transação', async () => {
+      const mission = makeMission();
+
+      prisma.mission.findUnique.mockResolvedValue(mission);
+      prisma.playerMission.findUnique.mockResolvedValue(null);
+
+      prisma.$transaction.mockRejectedValueOnce(
+        new Error('DB connection lost'),
+      );
+
+      await expect(
+        service.completeMission('user-id', mission.id),
+      ).rejects.toThrow('Erro ao completar a missão');
+    });
+
+    it('deve retornar o PlayerMission criado com campos corretos', async () => {
+      const mission = makeMission();
+      const userId = 'user-id-001';
+
+      prisma.mission.findUnique.mockResolvedValue(mission);
+      prisma.playerMission.findUnique.mockResolvedValue(null);
+
+      const result = await service.completeMission(userId, mission.id);
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          id: expect.any(String),
+          userId: expect.any(String),
+          missionId: expect.any(String),
+          completedAt: expect.any(Date),
+        }),
+      );
+    });
   });
 
-  it('deve lançar ConflictException se missão já completada', async () => {
-    const mission = makeMission();
-    const existing = makePlayerMission();
+  describe('getPlayerHistory', () => {
+    it('deve retornar histórico do usuário com missões incluídas', async () => {
+      const userId = 'user-id-001';
+      const mission = makeMission();
+      const history = [
+        { ...makePlayerMission({ userId }), mission },
+        {
+          ...makePlayerMission({ userId, missionId: 'mission-id-002' }),
+          mission,
+        },
+      ];
 
-    prisma.mission.findUnique.mockResolvedValue(mission);
-    prisma.playerMission.findUnique.mockResolvedValue(existing);
+      prisma.playerMission.findMany = jest.fn().mockResolvedValue(history);
 
-    await expect(
-      service.completeMission('user-id', mission.id),
-    ).rejects.toThrow(ConflictException);
-  });
+      const result = await service.getPlayerHistory(userId);
 
-  it('deve chamar rankingGateway.broadcastUpdate após sucesso', async () => {
-    const mission = makeMission();
+      expect(result).toHaveLength(2);
+      expect(result[0]).toHaveProperty('mission');
+    });
 
-    prisma.mission.findUnique.mockResolvedValue(mission);
-    prisma.playerMission.findUnique.mockResolvedValue(null);
-    prisma.user.update.mockResolvedValue(makeUser());
+    it('deve retornar array vazio quando usuário não tem missões', async () => {
+      prisma.playerMission.findMany = jest.fn().mockResolvedValue([]);
 
-    await service.completeMission('user-id', mission.id);
+      const result = await service.getPlayerHistory('user-without-missions');
 
-    expect(rankingGateway.broadcastUpdate).toHaveBeenCalledTimes(1);
-  });
-
-  it('deve tratar erro P2002 como ConflictException', async () => {
-    const mission = makeMission();
-
-    prisma.mission.findUnique.mockResolvedValue(mission);
-    prisma.playerMission.findUnique.mockResolvedValue(null);
-
-    // Simula erro de constraint unique (race condition)
-    prisma.$transaction.mockRejectedValueOnce({ code: 'P2002' });
-
-    await expect(
-      service.completeMission('user-id', mission.id),
-    ).rejects.toThrow(ConflictException);
-  });
-
-  it('deve retornar o PlayerMission criado com campos corretos', async () => {
-    const mission = makeMission();
-    const userId = 'user-id-001';
-
-    prisma.mission.findUnique.mockResolvedValue(mission);
-    prisma.playerMission.findUnique.mockResolvedValue(null);
-
-    const result = await service.completeMission(userId, mission.id);
-
-    expect(result).toEqual(
-      expect.objectContaining({
-        id: expect.any(String),
-        userId: expect.any(String),
-        missionId: expect.any(String),
-        completedAt: expect.any(Date),
-      }),
-    );
+      expect(result).toEqual([]);
+    });
   });
 });
