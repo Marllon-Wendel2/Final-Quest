@@ -11,9 +11,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:3001',
       'https://trippant-samira-shiny.ngrok-free.dev',
-      'https://final-quest.vercel.app/',
       'https://final-quest.vercel.app',
-      'https://final-quest-git-cd-deploy-marllon-wendel2s-projects.vercel.app/',
       'https://final-quest-git-cd-deploy-marllon-wendel2s-projects.vercel.app',
     ],
     allowedHeaders: [
