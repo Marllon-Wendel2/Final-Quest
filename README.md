@@ -26,7 +26,7 @@ cp frontend/.env.example frontend/.env
 ### 2. Subir tudo com um comando
 
 ```bash
-docker compose up --build
+docker compose up -d
 ```
 
 Isso sobe 4 serviços automaticamente:
