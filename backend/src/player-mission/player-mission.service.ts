@@ -1,9 +1,17 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { RankingGateway } from 'src/raking/raking.gateway';
 
 @Injectable()
 export class PlayerMissionService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly rankingGateway: RankingGateway,
+    private readonly prismaService: PrismaService,
+  ) {}
 
   async completeMission(userId: string, missionId: string) {
     const mission = await this.prismaService.mission.findUnique({
@@ -14,18 +22,19 @@ export class PlayerMissionService {
       throw new NotFoundException('Missão não encontrada');
     }
 
-    const existingCompletion = await this.prismaService.playerMission.findUnique({
-      where: {
-        userId_missionId: { userId, missionId },
-      },
-    });
+    const existingCompletion =
+      await this.prismaService.playerMission.findUnique({
+        where: {
+          userId_missionId: { userId, missionId },
+        },
+      });
 
     if (existingCompletion) {
       throw new ConflictException('Missão já completada');
     }
 
     try {
-      return await this.prismaService.$transaction(async (tx) => {
+      const result = await this.prismaService.$transaction(async (tx) => {
         const playerMission = await tx.playerMission.create({
           data: { userId, missionId },
         });
@@ -39,6 +48,9 @@ export class PlayerMissionService {
 
         return playerMission;
       });
+
+      this.rankingGateway.broadcastUpdate();
+      return result;
     } catch (error) {
       if (error.code === 'P2002') {
         throw new ConflictException('Missão já completada');
