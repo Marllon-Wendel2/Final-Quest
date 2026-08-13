@@ -136,8 +136,8 @@ export default function MissionsList({ onMissionComplete }: MissionsListProps) {
                   transition: 'all 0.3s ease',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <h3 style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.7rem', color: 'var(--gold)', margin: 0 }}>
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <h3 style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.7rem', color: 'var(--gold)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>
                     {mission.title}
                   </h3>
                   <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.6rem', color: 'var(--gold)' }}>
