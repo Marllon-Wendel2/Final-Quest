@@ -1,9 +1,6 @@
 #!/bin/sh
 set -e
 
-echo "Gerando Prisma Client..."
-npx prisma generate
-
 echo "Rodando prisma migrate deploy..."
 npx prisma migrate deploy
 
