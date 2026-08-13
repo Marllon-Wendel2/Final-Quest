@@ -13,6 +13,8 @@ async function bootstrap() {
       'https://trippant-samira-shiny.ngrok-free.dev',
       'https://final-quest.vercel.app/',
       'https://final-quest.vercel.app',
+      'https://final-quest-git-cd-deploy-marllon-wendel2s-projects.vercel.app/',
+      'https://final-quest-git-cd-deploy-marllon-wendel2s-projects.vercel.app',
     ],
     allowedHeaders: [
       'Content-Type',
