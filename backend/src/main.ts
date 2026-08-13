@@ -11,6 +11,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:3001',
       'https://trippant-samira-shiny.ngrok-free.dev',
+      'https://final-quest.vercel.app/',
     ],
     allowedHeaders: [
       'Content-Type',
