@@ -15,6 +15,8 @@ import { JwtService } from '@nestjs/jwt';
       'http://localhost:3000',
       'http://localhost:3001',
       'https://trippant-samira-shiny.ngrok-free.dev',
+      'https://final-quest.vercel.app',
+      'https://final-quest-git-cd-deploy-marllon-wendel2s-projects.vercel.app',
     ],
     credentials: true,
   },
