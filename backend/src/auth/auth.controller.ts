@@ -26,10 +26,11 @@ export class AuthController {
   ) {
     const result = await this.authService.register(registerDto);
 
+    const isProd = process.env.NODE_ENV === 'production';
     res.cookie('token', result.accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -46,10 +47,11 @@ export class AuthController {
   ) {
     const result = await this.authService.login(loginDto);
 
+    const isProd = process.env.NODE_ENV === 'production';
     res.cookie('token', result.accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
