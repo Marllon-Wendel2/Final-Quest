@@ -5,6 +5,7 @@ import Image from 'next/image';
 import AuthForm from './components/AuthForm';
 import MissionsList from './components/MissionsList';
 import RankingList from './components/RankingList';
+import ServerWakeUpBanner from './components/ServerWakeUpBanner';
 import { logout } from '../api/auth';
 import { getMe, User } from '../api/client';
 import './globals.css';
@@ -83,6 +84,7 @@ export default function Home() {
         <div className="battleground">
           <img src="/Battleground3.png" alt="" />
         </div>
+        <ServerWakeUpBanner />
         <audio ref={audioRef} src="/Week 26 - Seaside CORAL REEF.ogg" loop autoPlay muted />
         <p style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.7rem', color: 'var(--gold)', position: 'relative', zIndex: 2 }}>
           CARREGANDO...
@@ -115,6 +117,7 @@ export default function Home() {
         <div className="battleground">
           <img src="/Battleground3.png" alt="" />
         </div>
+        <ServerWakeUpBanner />
         <audio ref={audioRef} src="/Week 26 - Seaside CORAL REEF.ogg" loop autoPlay muted />
         <button onClick={() => { const a = audioRef.current; if (a) { a.muted = !a.muted; setIsMuted(a.muted); } }} className="mute-btn">
           {isMuted ? (
@@ -158,6 +161,7 @@ export default function Home() {
       <div className="battleground">
         <img src="/Battleground3.png" alt="" />
       </div>
+      <ServerWakeUpBanner />
       <audio ref={audioRef} src="/Week 26 - Seaside CORAL REEF.ogg" loop autoPlay muted />
       <button onClick={() => { const a = audioRef.current; if (a) { a.muted = !a.muted; setIsMuted(a.muted); } }} className="mute-btn">
         {isMuted ? (

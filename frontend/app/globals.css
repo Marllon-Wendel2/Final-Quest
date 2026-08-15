@@ -800,3 +800,99 @@ body {
   10% { opacity: 0.6; }
   100% { opacity: 0; }
 }
+
+/* ========================================
+   SERVER WAKE-UP BANNER
+   ======================================== */
+
+.server-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 1rem 1.5rem;
+  font-family: 'Press Start 2P', monospace;
+  animation: bannerSlideDown 0.3s ease-out;
+}
+
+@keyframes bannerSlideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.server-banner-waking {
+  background: linear-gradient(180deg, rgba(247, 208, 96, 0.95) 0%, rgba(201, 168, 76, 0.95) 100%);
+  border-bottom: 3px solid var(--gold-dark);
+  box-shadow: 0 4px 20px rgba(247, 208, 96, 0.4);
+}
+
+.server-banner-error {
+  background: linear-gradient(180deg, rgba(204, 51, 51, 0.95) 0%, rgba(153, 0, 0, 0.95) 100%);
+  border-bottom: 3px solid #990000;
+  box-shadow: 0 4px 20px rgba(204, 51, 51, 0.4);
+}
+
+.server-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  max-width: 56rem;
+  margin: 0 auto;
+}
+
+.server-banner-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.server-banner-spinner {
+  animation: bannerSpin 1s linear infinite;
+}
+
+@keyframes bannerSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.server-banner-text {
+  font-size: 0.6rem;
+  color: var(--parchment-dark);
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+  letter-spacing: 1px;
+  line-height: 1.6;
+}
+
+.server-banner-error .server-banner-text {
+  color: white;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.server-banner-progress {
+  height: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  margin-top: 0.75rem;
+  max-width: 56rem;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden;
+}
+
+.server-banner-progress-fill {
+  height: 100%;
+  background: var(--parchment-dark);
+  transition: width 0.3s ease-out;
+  animation: progressPulse 1s ease-in-out infinite;
+}
+
+@keyframes progressPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
