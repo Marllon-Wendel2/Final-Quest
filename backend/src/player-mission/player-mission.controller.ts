@@ -14,6 +14,11 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class PlayerMissionsController {
   constructor(private readonly playerMissionService: PlayerMissionService) {}
 
+  @Get('available')
+  async getAvailable(@Request() req: { user: { id: string } }) {
+    return this.playerMissionService.getAvailableMissions(req.user.id);
+  }
+
   @Post('complete/:missionId')
   async complete(
     @Param('missionId') missionId: string,

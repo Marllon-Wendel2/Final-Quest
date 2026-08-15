@@ -1,10 +1,15 @@
 import { ZodValidationPipe } from 'src/common/zod-validation-pipe';
 import z from 'zod';
 
+const FrequencyEnum = z.enum(['MINUTE', 'HOUR', 'DAILY', 'WEEKLY', 'ONCE']);
+
 export const CreateMissionSchema = z.object({
   title: z.string(),
   description: z.string(),
   points: z.number(),
+
+  frequency: FrequencyEnum.default('ONCE'),
+  resetWindow: z.string().optional(),
 });
 
 export type CreateMissionDto = z.infer<typeof CreateMissionSchema>;
