@@ -120,13 +120,16 @@ docker compose up --build backend
 
 ## O que Ficou de Fora (por tempo)
 
+- **Animação de parabéns**: efeito visual de celebração ao completar missão não implementado
+- **Chat ao vivo com players online**: chat em tempo real entre jogadores não implementado
+- **Missão por dia, semana, única**: sistema de missões recorrentes (diárias, semanais) não implementado
+- **Recuperação de senha**: fluxo de reset não implementado
+- **Documentação da API**: sem Swagger/OpenAPI configurado
+- **Fila de queries**: concorrência tratada via constraint do banco (`@@unique`) + tratamento de erro, mas sem fila dedicada
+- **Rate limiting**: nenhum contra-ataque de força bruta ou abuso de API
 - **Testes automatizados**: backend e frontend sem cobertura de testes unitários e e2e
 - **CI/CD**: pipeline de build, lint e deploy não configurado
-- **Rate limiting**: nenhum contra-ataque de força bruta ou abuso de API
-- **Fila de requisições**: concorrência tratada via constraint do banco (`@@unique`) + tratamento de erro, mas sem fila dedicada
-- **Recuperação de senha**: fluxo de reset não implementado
 - **Paginação**: listagem de missões e ranking carregam todos os registros
-- **Documentação da API**: sem Swagger/OpenAPI configurado
 - **Logs estruturados**: logs em texto plano, sem formato JSON para ferramentas de observabilidade
 
 ---
