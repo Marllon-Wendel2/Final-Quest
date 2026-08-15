@@ -831,6 +831,74 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
           opacity: 0.5;
           letter-spacing: 0.5rem;
         }
+
+        @media (max-width: 480px) {
+          .quest-card {
+            flex-direction: column;
+            gap: 0.5rem;
+          }
+
+          .quest-number-badge {
+            align-self: flex-start;
+          }
+
+          .quest-card-header {
+            flex-direction: column;
+            gap: 0.3rem;
+          }
+
+          .quest-card-meta {
+            gap: 0.3rem;
+          }
+
+          .quest-completed-badge {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.3rem;
+            padding: 0.3rem 0.5rem;
+            font-size: 0.4rem;
+          }
+
+          .quest-countdown {
+            margin-left: 0;
+            padding-left: 0;
+            border-left: none;
+            margin-top: 0.2rem;
+            padding-top: 0.2rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.3);
+            width: 100%;
+            justify-content: center;
+          }
+
+          .quest-countdown-icon {
+            font-size: 0.5rem;
+          }
+
+          .quest-countdown-value {
+            font-size: 0.45rem;
+          }
+
+          .quest-type-badge {
+            font-size: 0.35rem;
+            padding: 0.15rem 0.3rem;
+          }
+
+          .quest-points {
+            font-size: 0.4rem;
+          }
+
+          .quest-card-description {
+            font-size: 0.4rem;
+            line-height: 1.6;
+          }
+
+          .quest-btn {
+            font-size: 0.4rem;
+            padding: 0.4rem 0.75rem;
+            width: 100%;
+            justify-content: center;
+          }
+        }
       `}</style>
     </div>
   );
