@@ -21,6 +21,8 @@ export function makeMission(overrides?: Partial<Mission>): Mission {
     description: 'A test mission',
     points: 50,
     createdAt: new Date('2026-01-01'),
+    frequency: 'ONCE',
+    maxCompletions: 1,
     ...overrides,
   };
 }
@@ -33,6 +35,7 @@ export function makePlayerMission(
     userId: 'user-id-001',
     missionId: 'mission-id-001',
     completedAt: new Date('2026-01-01'),
+    resetWindow: 'once',
     ...overrides,
   };
 }

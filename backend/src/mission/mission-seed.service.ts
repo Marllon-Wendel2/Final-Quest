@@ -19,33 +19,57 @@ export class MissionSeedService implements OnModuleInit {
     await this.prisma.mission.createMany({
       data: [
         {
-          title: 'Chegue na dungeon',
-          description: 'Encontre e chegue na dungeon do jogo',
-          points: 10,
+          title: 'Aperte o botão rápido',
+          description:
+            'Aperte o botão antes que o tempo acabe (uma vez por minuto)',
+          points: 5,
+          frequency: 'MINUTE',
         },
+
         {
-          title: 'Derrote 5 goblins',
-          description: 'Vença 5 goblins em batalha',
-          points: 20,
+          title: 'Beba um copo de água',
+          description: 'Beba pelo menos um copo de água por hora',
+          points: 5,
+          frequency: 'HOUR',
         },
-        {
-          title: 'Consiga um pet',
-          description: 'Adote ou encontre um pet para te acompanhar',
-          points: 15,
-        },
+
         {
           title: 'Beba 4 litros de água',
           description: 'Mantenha-se hidratado bebendo 4 litros de água',
           points: 10,
+          frequency: 'DAILY',
         },
         {
-          title: 'Durma 7 horas para restaurar seu personagem',
+          title: 'Durma 7 horas',
           description: 'Durma pelo menos 7 horas para restaurar energia',
           points: 15,
+          frequency: 'DAILY',
+        },
+
+        {
+          title: 'Complete 3 treinos na semana',
+          description: 'Faça pelo menos 3 sessões de treino durante a semana',
+          points: 50,
+          frequency: 'WEEKLY',
+        },
+
+        {
+          title: 'Chegue na dungeon',
+          description: 'Encontre e chegue na dungeon do jogo',
+          points: 10,
+          frequency: 'ONCE',
+        },
+
+        {
+          title: 'Derrote 5 goblins',
+          description: 'Vença 5 goblins em batalha (pode fazer 3 vezes)',
+          points: 20,
+          frequency: 'ONCE',
+          maxCompletions: 3,
         },
       ],
     });
 
-    this.logger.log('5 missões criadas com sucesso!');
+    this.logger.log('7 missões criadas com sucesso!');
   }
 }
