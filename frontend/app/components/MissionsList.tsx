@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { getMissions, Mission } from '../../api/mission';
 import { completeMission, getMyMissions, PlayerMission } from '../../api/player-mission';
+import VictoryAnimation from './VictoryAnimation';
 
 interface MissionsListProps {
   onMissionComplete?: () => void;
+  bgAudioRef?: React.RefObject<HTMLAudioElement | null>;
 }
 
 interface FloatingPoints {
@@ -15,7 +17,7 @@ interface FloatingPoints {
   y: number;
 }
 
-export default function MissionsList({ onMissionComplete }: MissionsListProps) {
+export default function MissionsList({ onMissionComplete, bgAudioRef }: MissionsListProps) {
   const [missions, setMissions] = useState<Mission[]>([]);
   const [completedMissions, setCompletedMissions] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -23,7 +25,9 @@ export default function MissionsList({ onMissionComplete }: MissionsListProps) {
   const [completingId, setCompletingId] = useState<string | null>(null);
   const [justCompletedId, setJustCompletedId] = useState<string | null>(null);
   const [floatingPoints, setFloatingPoints] = useState<FloatingPoints[]>([]);
+  const [victoryData, setVictoryData] = useState<{ points: number; missionTitle: string } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const victorySfxRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     Promise.all([getMissions(), getMyMissions()])
@@ -32,7 +36,7 @@ export default function MissionsList({ onMissionComplete }: MissionsListProps) {
         const completedIds = new Set(playerMissions.map((pm: PlayerMission) => pm.missionId));
         setCompletedMissions(completedIds);
       })
-      .catch(() => setError('Erro ao carregar missoes'))
+      .catch(() => setError('Erro ao carregar missões'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -60,6 +64,27 @@ export default function MissionsList({ onMissionComplete }: MissionsListProps) {
       setCompletedMissions((prev) => new Set([...prev, missionId]));
       setJustCompletedId(missionId);
       setTimeout(() => setJustCompletedId(null), 1000);
+
+      const completedMission = missions.find((m) => m.id === missionId);
+      if (completedMission) {
+        setVictoryData({ points: completedMission.points, missionTitle: completedMission.title });
+        const sfx = victorySfxRef.current;
+        if (sfx) {
+          sfx.currentTime = 0;
+          sfx.volume = 0.5;
+          sfx.play().catch(() => {});
+
+          const bg = bgAudioRef?.current;
+          if (bg) bg.pause();
+
+          setTimeout(() => {
+            sfx.pause();
+            sfx.currentTime = 0;
+            if (bg) bg.play().catch(() => {});
+          }, 6000);
+        }
+      }
+
       onMissionComplete?.();
     } catch {
       setError('Erro ao completar missao');
@@ -91,7 +116,7 @@ export default function MissionsList({ onMissionComplete }: MissionsListProps) {
       ))}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
         <h2 style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.85rem', color: 'var(--gold)', margin: 0 }}>
-          Missoes
+          Missões
         </h2>
         {!loading && missions.length > 0 && (
           <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.55rem', color: 'var(--gold)' }}>
@@ -114,7 +139,7 @@ export default function MissionsList({ onMissionComplete }: MissionsListProps) {
 
       {!loading && !error && missions.length === 0 && (
         <p style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.6rem', color: 'var(--text-dim)', lineHeight: 1.8 }}>
-          Suas missoes aparecerao aqui em breve...
+          Suas missões aparecerao aqui em breve...
         </p>
       )}
 
@@ -182,6 +207,14 @@ export default function MissionsList({ onMissionComplete }: MissionsListProps) {
           })}
         </div>
       )}
+      {victoryData && (
+        <VictoryAnimation
+          points={victoryData.points}
+          missionTitle={victoryData.missionTitle}
+          onComplete={() => setVictoryData(null)}
+        />
+      )}
+      <audio ref={victorySfxRef} src="/4. Ballad of Ashenwood.mp3" preload="auto" />
     </div>
   );
 }
