@@ -1,4 +1,5 @@
 import api from "./client";
+import { apiRequestWithRetry } from "./retry";
 
 export type Frequency = 'MINUTE' | 'HOUR' | 'DAILY' | 'WEEKLY' | 'ONCE';
 
@@ -13,6 +14,6 @@ export interface Mission {
 }
 
 export async function getMissions(): Promise<Mission[]> {
-    const { data } = await api.get('/mission');
+    const { data } = await apiRequestWithRetry(() => api.get('/mission'));
     return data;
 }

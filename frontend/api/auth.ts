@@ -1,4 +1,5 @@
 import api from "./client";
+import { apiRequestWithRetry } from "./retry";
 
 interface UserResponse {
     id: string;
@@ -8,7 +9,7 @@ interface UserResponse {
 }
 
 export async function login(email: string, password: string): Promise<UserResponse> {
-  const { data } = await api.post('/auth/login', { email, password });
+  const { data } = await apiRequestWithRetry(() => api.post('/auth/login', { email, password }));
   return data;
 }
 
@@ -17,10 +18,10 @@ export async function register(userData: {
   email: string;
   password: string;
 }): Promise<UserResponse> {
-  const { data } = await api.post('/auth/register', userData);
+  const { data } = await apiRequestWithRetry(() => api.post('/auth/register', userData));
   return data;
 }
 
 export async function logout(): Promise<void> {
-  await api.post('/auth/logout');
+  await apiRequestWithRetry(() => api.post('/auth/logout'));
 }

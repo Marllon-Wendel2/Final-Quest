@@ -1,4 +1,5 @@
 import api from "./client";
+import { apiRequestWithRetry } from "./retry";
 
 export interface PlayerMission {
   id: string;
@@ -34,16 +35,16 @@ export interface AvailableMission {
 }
 
 export async function completeMission(missionId: string): Promise<PlayerMission> {
-    const { data } = await api.post(`/player-missions/complete/${missionId}`);
+    const { data } = await apiRequestWithRetry(() => api.post(`/player-missions/complete/${missionId}`));
     return data;
 }
 
 export async function getMyMissions(): Promise<PlayerMission[]> {
-    const { data } = await api.get('/player-missions/my-missions');
+    const { data } = await apiRequestWithRetry(() => api.get('/player-missions/my-missions'));
     return data;
 }
 
 export async function getAvailableMissions(): Promise<AvailableMission[]> {
-    const { data } = await api.get('/player-missions/available');
+    const { data } = await apiRequestWithRetry(() => api.get('/player-missions/available'));
     return data;
 }
