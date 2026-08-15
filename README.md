@@ -118,11 +118,11 @@ docker compose up --build backend
 
 ---
 
-## O que Ficou de Fora (por tempo)
+## O que Ficou de Fora ou extras implementados
 
-- **Animação de parabéns**: efeito visual de celebração ao completar missão não implementado
-- **Chat ao vivo com players online**: chat em tempo real entre jogadores não implementado
+- [x] **Animação de parabéns**: efeito visual de celebração ao completar missão não implementado
 - **Missão por dia, semana, única**: sistema de missões recorrentes (diárias, semanais) não implementado
+- **Chat ao vivo com players online**: chat em tempo real entre jogadores não implementado
 - **Recuperação de senha**: fluxo de reset não implementado
 - **Documentação da API**: sem Swagger/OpenAPI configurado
 - **Fila de queries**: concorrência tratada via constraint do banco (`@@unique`) + tratamento de erro, mas sem fila dedicada
