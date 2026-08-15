@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface VictoryAnimationProps {
   points: number;
@@ -40,17 +40,19 @@ function createParticles(count: number): Particle[] {
 export default function VictoryAnimation({ points, missionTitle, onComplete }: VictoryAnimationProps) {
   const [particles] = useState(() => createParticles(40));
   const [phase, setPhase] = useState<'enter' | 'show' | 'exit'>('enter');
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
     const showTimer = setTimeout(() => setPhase('show'), 100);
     const exitTimer = setTimeout(() => setPhase('exit'), 3000);
-    const completeTimer = setTimeout(() => onComplete?.(), 3800);
+    const completeTimer = setTimeout(() => onCompleteRef.current?.(), 3800);
     return () => {
       clearTimeout(showTimer);
       clearTimeout(exitTimer);
       clearTimeout(completeTimer);
     };
-  }, [onComplete]);
+  }, []);
 
   return (
     <div
@@ -90,7 +92,7 @@ export default function VictoryAnimation({ points, missionTitle, onComplete }: V
         <div className="victory-sword-icon">⚔</div>
         <h1 className="victory-title">VITORIA!</h1>
         <div className="victory-divider">═══════════════</div>
-        <p className="victory-subtitle">MISSAO COMPLETA!</p>
+        <p className="victory-subtitle">MISSãO COMPLETA!</p>
         <div className="victory-mission-name">{missionTitle}</div>
         <div className="victory-points">
           <span className="victory-points-icon">★</span>
