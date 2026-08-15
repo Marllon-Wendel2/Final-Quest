@@ -7,6 +7,7 @@ import { createRankingGatewayMock } from 'src/test/ranking-gateway.mock';
 import { makeMission, makePlayerMission, makeUser } from 'src/test/fixtures';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RankingGateway } from 'src/raking/raking.gateway';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 
 describe('PlayerMissionService', () => {
   let service: PlayerMissionService;
@@ -34,6 +35,7 @@ describe('PlayerMissionService', () => {
       const userId = 'user-id-001';
 
       prisma.mission.findUnique.mockResolvedValue(mission);
+      prisma.playerMission.count.mockResolvedValue(0);
       prisma.playerMission.findUnique.mockResolvedValue(null);
 
       const result = await service.completeMission(userId, mission.id);
@@ -57,7 +59,7 @@ describe('PlayerMissionService', () => {
       const existing = makePlayerMission();
 
       prisma.mission.findUnique.mockResolvedValue(mission);
-      prisma.playerMission.findUnique.mockResolvedValue(existing);
+      prisma.playerMission.count.mockResolvedValue(1);
 
       await expect(
         service.completeMission('user-id', mission.id),
@@ -68,6 +70,7 @@ describe('PlayerMissionService', () => {
       const mission = makeMission();
 
       prisma.mission.findUnique.mockResolvedValue(mission);
+      prisma.playerMission.count.mockResolvedValue(0);
       prisma.playerMission.findUnique.mockResolvedValue(null);
       prisma.user.update.mockResolvedValue(makeUser());
 
@@ -80,9 +83,12 @@ describe('PlayerMissionService', () => {
       const mission = makeMission();
 
       prisma.mission.findUnique.mockResolvedValue(mission);
+      prisma.playerMission.count.mockResolvedValue(0);
       prisma.playerMission.findUnique.mockResolvedValue(null);
 
-      prisma.$transaction.mockRejectedValueOnce({ code: 'P2002' });
+      prisma.$transaction.mockRejectedValueOnce(
+        new PrismaClientKnownRequestError('Unique constraint failed', { code: 'P2002', clientVersion: '0.0.0' }),
+      );
 
       await expect(
         service.completeMission('user-id', mission.id),
@@ -93,6 +99,7 @@ describe('PlayerMissionService', () => {
       const mission = makeMission();
 
       prisma.mission.findUnique.mockResolvedValue(mission);
+      prisma.playerMission.count.mockResolvedValue(0);
       prisma.playerMission.findUnique.mockResolvedValue(null);
 
       prisma.$transaction.mockRejectedValueOnce(
@@ -109,6 +116,7 @@ describe('PlayerMissionService', () => {
       const userId = 'user-id-001';
 
       prisma.mission.findUnique.mockResolvedValue(mission);
+      prisma.playerMission.count.mockResolvedValue(0);
       prisma.playerMission.findUnique.mockResolvedValue(null);
 
       const result = await service.completeMission(userId, mission.id);
