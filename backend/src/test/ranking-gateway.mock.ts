@@ -1,4 +1,4 @@
-import { RankingGateway } from '../raking/raking.gateway';
+import { RankingGateway } from '../ranking/ranking.gateway';
 
 export function createRankingGatewayMock() {
   return {

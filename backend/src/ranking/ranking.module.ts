@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { RankingGateway } from './raking.gateway';
+import { RankingGateway } from './ranking.gateway';
 
 @Module({
   providers: [RankingGateway],

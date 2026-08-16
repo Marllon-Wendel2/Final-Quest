@@ -7,7 +7,8 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { MissionModule } from './mission/mission.module';
 import { PlayerMissionModule } from './player-mission/player-mission.module';
-import { RankingModule } from './raking/raking.module';
+import { RankingModule } from './ranking/ranking.module';
+import { QueueModule } from './queue/queue.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { RankingModule } from './raking/raking.module';
     MissionModule,
     PlayerMissionModule,
     RankingModule,
+    QueueModule,
   ],
   controllers: [AppController],
   providers: [AppService],
