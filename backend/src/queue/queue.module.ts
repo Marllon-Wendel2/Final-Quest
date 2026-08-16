@@ -9,35 +9,32 @@ import { MissionWorker } from './mission.worker';
 import { MissionProcessorService } from './mission.processor';
 
 function parseRedisConfig() {
-  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-
-  const baseConfig = {
-    maxRetriesPerRequest: null,
-    keepAlive: 10000,
-    retryStrategy(times: number) {
-      const delay = Math.min(times * 50, 2000);
-      return delay;
-    },
-  };
+  const url = process.env.REDIS_URL;
 
   if (url) {
-    const parsed = new URL(url);
-    const isTLS = parsed.protocol === 'rediss:';
-
     return {
-      ...baseConfig,
-      host: parsed.hostname,
-      port: parseInt(parsed.port || '6379', 10),
-      password: token || parsed.password || undefined,
-      tls: isTLS ? { rejectUnauthorized: false } : undefined,
+      url,
+      tls: url.startsWith('rediss://')
+        ? { rejectUnauthorized: false }
+        : undefined,
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+      keepAlive: 10000,
+      retryStrategy(times: number) {
+        return Math.min(times * 50, 2000);
+      },
     };
   }
 
   return {
-    ...baseConfig,
     host: process.env.REDIS_HOST || 'localhost',
     port: parseInt(process.env.REDIS_PORT || '6379', 10),
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
+    keepAlive: 10000,
+    retryStrategy(times: number) {
+      return Math.min(times * 50, 2000);
+    },
   };
 }
 
