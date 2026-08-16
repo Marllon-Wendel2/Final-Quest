@@ -5,7 +5,12 @@ type TransactionClient = {
 
 export type PrismaMock = {
   mission: { findUnique: jest.Mock };
-  playerMission: { findUnique: jest.Mock; findMany: jest.Mock; count: jest.Mock; create: jest.Mock };
+  playerMission: {
+    findUnique: jest.Mock;
+    findMany: jest.Mock;
+    count: jest.Mock;
+    create: jest.Mock;
+  };
   user: { update: jest.Mock };
   $transaction: jest.Mock;
 };
