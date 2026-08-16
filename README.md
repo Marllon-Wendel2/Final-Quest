@@ -56,7 +56,7 @@ O backend executa automaticamente:
 1. Aguarda o PostgreSQL estar saudável (`healthcheck`)
 2. Gera o Prisma Client
 3. Aplica migrations pendentes
-4. Cria as 5 missões iniciais (seed)
+4. Cria as 7 missões iniciais (seed)
 
 ### 3. Acessar
 
@@ -121,11 +121,11 @@ docker compose up --build backend
 ## O que Ficou de Fora ou extras implementados
 
 - [x] **Animação de parabéns**: efeito visual de celebração ao completar missão não implementado
-- **Missão por dia, semana, única**: sistema de missões recorrentes (diárias, semanais) não implementado
-- **Fila de queries**: concorrência tratada via constraint do banco (`@@unique`) + tratamento de erro, mas sem fila dedicada
+- [x] **Missão por dia, semana, única**: sistema de missões recorrentes (diárias, semanais) não implementado
+- [x] **Fila de queries**: concorrência tratada via constraint do banco (`@@unique`) + tratamento de erro, mas sem fila dedicada
+- [x] **Documentação da API**: sem Swagger/OpenAPI configurado
 - **Chat ao vivo com players online**: chat em tempo real entre jogadores não implementado
 - **Recuperação de senha**: fluxo de reset não implementado
-- **Documentação da API**: sem Swagger/OpenAPI configurado
 - **Rate limiting**: nenhum contra-ataque de força bruta ou abuso de API
 - **Testes automatizados**: backend e frontend sem cobertura de testes unitários e e2e
 - **CI/CD**: pipeline de build, lint e deploy não configurado
@@ -142,12 +142,6 @@ docker compose up --build backend
 - Linting automatizado no CI (ESLint + Prettier)
 - Coverage mínimo obrigatório
 
-**Infraestrutura e DevOps**
-- CI/CD com GitHub Actions (build → test → deploy)
-- Docker multi-stage builds para imagens menores
-- Rate limiting com `@nestjs/throttler`
-- Logs estruturados com pino ou Winston
-- Health checks no backend (`/health` endpoint)
 
 **Funcionalidades**
 - Fila Bull + Redis para processamento assíncrono de missões concorrentes
