@@ -3,16 +3,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { getResetWindow } from 'src/mission/reset-window';
+import { MissionQueue } from 'src/queue/mission.queue';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { RankingGateway } from 'src/raking/raking.gateway';
+import { RankingGateway } from 'src/ranking/ranking.gateway';
 
 @Injectable()
 export class PlayerMissionService {
   constructor(
     private readonly rankingGateway: RankingGateway,
     private readonly prismaService: PrismaService,
+    private readonly missionQueue: MissionQueue,
   ) {}
 
   async completeMission(userId: string, missionId: string) {
@@ -24,87 +25,27 @@ export class PlayerMissionService {
       throw new NotFoundException('Missão não encontrada');
     }
 
-    let resetWindow = getResetWindow(mission.frequency);
-
-    // Para ONCE com limite, cada completion usa um resetWindow único
+    // Validação rápida de negócio (fail fast antes de enfileirar)
     if (mission.frequency === 'ONCE' && mission.maxCompletions != null) {
       const totalCompletions = await this.prismaService.playerMission.count({
         where: { userId, missionId, resetWindow: { startsWith: 'once-' } },
       });
-
       if (totalCompletions >= mission.maxCompletions) {
         throw new ConflictException(
-          `Missão já completada ${mission.maxCompletions} vezes (limite atingido)`,
+          `Missão já completada ${mission.maxCompletions} vezes`,
         );
       }
-
-      resetWindow = `once-${totalCompletions + 1}`;
-    } else if (mission.frequency === 'ONCE') {
-      // ONCE sem limite — usa 'once' mas verifica se já existe
-      const existingCompletion =
-        await this.prismaService.playerMission.findUnique({
-          where: {
-            userId_missionId_resetWindow: { userId, missionId, resetWindow },
-          },
-        });
-
-      if (existingCompletion) {
-        throw new ConflictException('Missão já completada');
-      }
-    } else {
-      // MINUTE, HOUR, DAILY, WEEKLY — verifica janela atual
-      const existingCompletion =
-        await this.prismaService.playerMission.findUnique({
-          where: {
-            userId_missionId_resetWindow: { userId, missionId, resetWindow },
-          },
-        });
-
-      if (existingCompletion) {
-        const message =
-          mission.frequency === 'MINUTE'
-            ? 'Missão já completada neste minuto'
-            : mission.frequency === 'HOUR'
-              ? 'Missão já completada nesta hora'
-              : mission.frequency === 'DAILY'
-                ? 'Missão já completada hoje'
-                : 'Missão já completada esta semana';
-        throw new ConflictException(message);
-      }
     }
 
-    try {
-      const result = await this.prismaService.$transaction(async (tx) => {
-        const playerMission = await tx.playerMission.create({
-          data: {
-            userId,
-            missionId,
-            resetWindow,
-          },
-        });
+    // Enfileira o job (não bloqueia o request)
+    const jobId = await this.missionQueue.addCompletion(userId, missionId);
 
-        await tx.user.update({
-          where: { id: userId },
-          data: {
-            points: { increment: mission.points },
-          },
-        });
-
-        return playerMission;
-      });
-
-      void this.rankingGateway.broadcastUpdate();
-      return result;
-    } catch (error: unknown) {
-      if (
-        error instanceof PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
-        throw new ConflictException('Missão já completada');
-      }
-      console.error(error);
-      throw new Error('Erro ao completar a missão');
-    }
+    // Retorna 202 Accepted — o processamento é assíncrono
+    return {
+      status: 'queued',
+      jobId,
+      message: 'Missão em processamento',
+    };
   }
 
   async getAvailableMissions(userId: string) {
