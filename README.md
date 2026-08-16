@@ -63,6 +63,12 @@ O backend executa automaticamente:
 - Abra `http://localhost:3001` no navegador
 - Registre uma conta e comece a completar missões
 
+### Deploy (Vercel)
+
+A aplicação está hospedada na Vercel:
+
+**https://final-quest.vercel.app/**
+
 ### Comandos úteis
 
 ```bash
