@@ -9,13 +9,15 @@ import { MissionWorker } from './mission.worker';
 import { MissionProcessorService } from './mission.processor';
 
 function parseRedisConfig() {
-  const url = process.env.REDIS_URL;
+  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+
   if (url) {
     const parsed = new URL(url);
     return {
       host: parsed.hostname,
       port: parseInt(parsed.port || '6379', 10),
-      password: parsed.password || undefined,
+      password: token || parsed.password || undefined,
       tls: parsed.protocol === 'rediss:' ? {} : undefined,
     };
   }

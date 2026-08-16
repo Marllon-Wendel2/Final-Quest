@@ -44,7 +44,8 @@ services:
       PGUSER: ${POSTGRES_USER}
       PORT: 3000
       JWT_SECRET: ${JWT_SECRET}
-      REDIS_URL: redis://redis:6379
+      UPSTASH_REDIS_REST_URL: redis://redis:6379
+      UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN:-}
     depends_on:
       postgres:
         condition: service_healthy
