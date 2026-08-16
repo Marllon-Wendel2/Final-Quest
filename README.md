@@ -122,10 +122,10 @@ docker compose up --build backend
 
 - [x] **Animação de parabéns**: efeito visual de celebração ao completar missão não implementado
 - **Missão por dia, semana, única**: sistema de missões recorrentes (diárias, semanais) não implementado
+- **Fila de queries**: concorrência tratada via constraint do banco (`@@unique`) + tratamento de erro, mas sem fila dedicada
 - **Chat ao vivo com players online**: chat em tempo real entre jogadores não implementado
 - **Recuperação de senha**: fluxo de reset não implementado
 - **Documentação da API**: sem Swagger/OpenAPI configurado
-- **Fila de queries**: concorrência tratada via constraint do banco (`@@unique`) + tratamento de erro, mas sem fila dedicada
 - **Rate limiting**: nenhum contra-ataque de força bruta ou abuso de API
 - **Testes automatizados**: backend e frontend sem cobertura de testes unitários e e2e
 - **CI/CD**: pipeline de build, lint e deploy não configurado
