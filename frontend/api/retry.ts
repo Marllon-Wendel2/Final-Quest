@@ -40,6 +40,10 @@ export function isNetworkError(error: AxiosError): boolean {
   }
   if (error.code === 'ECONNABORTED') return true;
   if (!error.response) return true;
+  if (error.response) {
+    const serverDownCodes = [502, 503, 504];
+    return serverDownCodes.includes(error.response.status);
+  }
   return false;
 }
 
