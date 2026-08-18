@@ -20,6 +20,12 @@ enum Frequency {
   MONTHLY
 }
 
+enum ChallengeType {
+  NONE
+  MEMORY
+  TIC_TAC_TOE
+}
+
 model User {
   id           String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email        String          @unique
@@ -43,6 +49,7 @@ model Mission {
   frequency      Frequency       @default(ONCE)
   maxCompletions Int             @default(1) @map("max_completions")
   players        PlayerMission[]
+  challengeType  ChallengeType   @default(NONE) @map("challenge_type")
 
   @@map("missions")
 }

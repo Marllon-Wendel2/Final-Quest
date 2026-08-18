@@ -23,6 +23,7 @@ export function makeMission(overrides?: Partial<Mission>): Mission {
     createdAt: new Date('2026-01-01'),
     frequency: 'ONCE',
     maxCompletions: 1,
+    challengeType: 'NONE',
     ...overrides,
   };
 }
