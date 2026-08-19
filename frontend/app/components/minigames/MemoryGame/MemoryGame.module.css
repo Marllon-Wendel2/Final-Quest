@@ -22,6 +22,9 @@
   width: 90%;
   position: relative;
   animation: slideUp 0.3s ease-out;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 @keyframes slideUp {
@@ -60,6 +63,7 @@
   cursor: pointer;
   padding: 0.5rem;
   line-height: 1;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .close:hover {
@@ -139,6 +143,7 @@
   transition: all 0.15s;
   position: relative;
   overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .card:hover:not(:disabled) {
@@ -288,6 +293,7 @@
   width: 100%;
   text-align: center;
   transition: all 0.1s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn:hover {
