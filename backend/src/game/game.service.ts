@@ -7,6 +7,14 @@ import { randomUUID } from 'crypto';
 import { RedisService } from 'src/redis/redis.service';
 import { BotService } from './bot.service';
 import { GameState, Board, GAME_TTL_SECONDS } from './game.types';
+import {
+  validateOwnership,
+  validateStatus,
+  getGame,
+  saveGame,
+  deleteGame,
+  findGamesByUserId,
+} from './game.utils';
 
 @Injectable()
 export class GameService {
@@ -28,19 +36,12 @@ export class GameService {
       createdAt: Date.now(),
     };
 
-    await this.redis.set(
-      `${this.KEY_PREFIX}${game.id}`,
-      JSON.stringify(game),
-      GAME_TTL_SECONDS,
-    );
-
+    await saveGame(this.redis, this.KEY_PREFIX, game, GAME_TTL_SECONDS);
     return game;
   }
 
   async getGame(gameId: string): Promise<GameState | null> {
-    const data = await this.redis.get(`${this.KEY_PREFIX}${gameId}`);
-    if (!data) return null;
-    return JSON.parse(data) as GameState;
+    return getGame<GameState>(this.redis, this.KEY_PREFIX, gameId);
   }
 
   async makeMove(
@@ -49,83 +50,68 @@ export class GameService {
     position: number,
   ): Promise<{ game: GameState; botMove?: number }> {
     const game = await this.getGame(gameId);
-
     if (!game) throw new NotFoundException('Jogo não encontrado');
-    if (game.userId !== userId)
-      throw new ConflictException('Jogo não pertence a este usuário');
-    if (game.status !== 'playing')
-      throw new ConflictException('Jogo já finalizado');
-    if (game.currentPlayer !== 'X')
-      throw new ConflictException('Não é seu turno');
-    if (game.board[position] !== null)
-      throw new ConflictException('Posição já ocupada');
 
-    // Jogada do jogador
+    validateOwnership(game, userId);
+    validateStatus(game, 'playing');
+    this.validatePlayerMove(game, position);
+
     game.board[position] = 'X';
 
-    // Verificar se jogador ganhou
     if (this.checkWinner(game.board) === 'X') {
       game.status = 'won';
-      await this.saveGame(game);
-      return { game, botMove: undefined };
+      await saveGame(this.redis, this.KEY_PREFIX, game, GAME_TTL_SECONDS);
+      return { game };
     }
 
-    // Verificar empate
     if (this.checkDraw(game.board)) {
       game.status = 'draw';
-      await this.saveGame(game);
-      return { game, botMove: undefined };
+      await saveGame(this.redis, this.KEY_PREFIX, game, GAME_TTL_SECONDS);
+      return { game };
     }
 
-    // Turno do bot
-    game.currentPlayer = 'O';
-    const botPosition = this.botService.getBotMove(game.board);
-    game.board[botPosition] = 'O';
+    const botPosition = this.executeBotMove(game);
 
-    // Verificar se bot ganhou
-    if (this.checkWinner(game.board) === 'O') {
-      game.status = 'lost';
-      await this.saveGame(game);
-      return { game, botMove: botPosition };
-    }
-
-    // Verificar empate após jogada do bot
-    if (this.checkDraw(game.board)) {
-      game.status = 'draw';
-      await this.saveGame(game);
-      return { game, botMove: botPosition };
-    }
-
-    // Voltar para jogador
-    game.currentPlayer = 'X';
-    await this.saveGame(game);
+    await saveGame(this.redis, this.KEY_PREFIX, game, GAME_TTL_SECONDS);
     return { game, botMove: botPosition };
   }
 
   async deleteGame(gameId: string): Promise<void> {
-    await this.redis.del(`${this.KEY_PREFIX}${gameId}`);
+    await deleteGame(this.redis, this.KEY_PREFIX, gameId);
   }
 
   async findGamesByUserId(userId: string): Promise<GameState[]> {
-    const keys = await this.redis.keys(`${this.KEY_PREFIX}*`);
-    const games: GameState[] = [];
-
-    for (const key of keys) {
-      const game = await this.getGame(key.replace(this.KEY_PREFIX, ''));
-      if (game && game.userId === userId && game.status === 'playing') {
-        games.push(game);
-      }
-    }
-
-    return games;
+    return findGamesByUserId<GameState>(
+      this.redis,
+      this.KEY_PREFIX,
+      userId,
+      'playing',
+    );
   }
 
-  private async saveGame(game: GameState): Promise<void> {
-    await this.redis.set(
-      `${this.KEY_PREFIX}${game.id}`,
-      JSON.stringify(game),
-      GAME_TTL_SECONDS,
-    );
+  private validatePlayerMove(game: GameState, position: number): void {
+    if (game.currentPlayer !== 'X') {
+      throw new ConflictException('Não é seu turno');
+    }
+    if (game.board[position] !== null) {
+      throw new ConflictException('Posição já ocupada');
+    }
+  }
+
+  private executeBotMove(game: GameState): number {
+    game.currentPlayer = 'O';
+    const botPosition = this.botService.getBotMove(game.board);
+    game.board[botPosition] = 'O';
+
+    if (this.checkWinner(game.board) === 'O') {
+      game.status = 'lost';
+    } else if (this.checkDraw(game.board)) {
+      game.status = 'draw';
+    } else {
+      game.currentPlayer = 'X';
+    }
+
+    return botPosition;
   }
 
   private checkWinner(board: Board): 'X' | 'O' | null {
