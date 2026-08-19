@@ -3,6 +3,7 @@
 import { ComponentType } from 'react';
 import NoChallenge from './Nochallenge';
 import TicTacToe from './TicTacToe/TicTacToe';
+import MemoryGame from './MemoryGame/MemoryGame';
 interface ChallengeProps {
   missionId: string;
   missionTitle: string;
@@ -14,7 +15,7 @@ interface ChallengeProps {
 const CHALLENGE_MAP: Record<string, ComponentType<ChallengeProps>> = {
   NONE: NoChallenge,
   TIC_TAC_TOE: TicTacToe,
-  // MEMORY: MemoryGame,  // futuro
+  MEMORY: MemoryGame,
 };
 
 interface ChallengeRouterProps extends ChallengeProps {

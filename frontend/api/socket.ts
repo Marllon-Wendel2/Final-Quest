@@ -1,3 +1,4 @@
+import { CardFlippedEvent, CardsHiddenEvent, MemoryGameCreatedEvent, MemoryGameOverEvent, TimerSyncEvent } from '@/app/types/memory-game';
 import { io, Socket } from 'socket.io-client';
 
 let socket: Socket | null = null;
@@ -82,5 +83,47 @@ export function offGameEvents() {
   s.off('game-created');
   s.off('game-updated');
   s.off('game-over');
+  s.off('error');
+}
+
+export function emitStartMemoryGame(missionId: string) {
+  getSocket().emit('start-memory-game', { missionId });
+}
+
+export function emitFlipCard(gameId: string, cardIndex: number) {
+  getSocket().emit('flip-card', { gameId, cardIndex });
+}
+
+export function emitRequestTimerSync(gameId: string) {
+  getSocket().emit('request-timer-sync', { gameId });
+}
+
+export function onMemoryGameCreated(callback: (data: MemoryGameCreatedEvent) => void) {
+  getSocket().on('memory-game-created', callback);
+}
+
+export function onCardFlipped(callback: (data: CardFlippedEvent) => void) {
+  getSocket().on('card-flipped', callback);
+}
+
+export function onCardsHidden(callback: (data: CardsHiddenEvent) => void) {
+  getSocket().on('cards-hidden', callback);
+}
+
+export function onTimerSync(callback: (data: TimerSyncEvent) => void) {
+  getSocket().on('timer-sync', callback);
+}
+
+export function onMemoryGameOver(callback: (data: MemoryGameOverEvent) => void) {
+  getSocket().on('memory-game-over', callback);
+}
+
+export function offMemoryGameEvents() {
+  const s = getSocket();
+  s.off('memory-game-created');
+  s.off('card-flipped');
+  s.off('cards-hidden');
+  s.off('timer-sync');
+  s.off('memory-game-over');
   s.off('error');
 }

@@ -98,9 +98,9 @@ export function useTicTacToe(
 
     const statusColor = (() => {
         switch (status) {
-        case 'won':  return '#4ade80';
-        case 'lost': return '#ef4444';
-        case 'draw': return '#eab308';
+        case 'won':  return '#7ab648';
+        case 'lost': return '#a04030';
+        case 'draw': return '#c9a84c';
         default:     return 'var(--gold)';
         }
     })();

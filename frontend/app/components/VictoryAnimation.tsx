@@ -1,6 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useAnimationPhase } from './animations/useAnimationPhase';
+import { VICTORY_COLORS, VICTORY_SYMBOLS } from './animations/result-configs';
+import ParticleEffect from './animations/ParticleEffect';
+import ResultOverlay from './animations/ResultOverlay';
 
 interface VictoryAnimationProps {
   points: number;
@@ -8,85 +11,23 @@ interface VictoryAnimationProps {
   onComplete?: () => void;
 }
 
-interface Particle {
-  id: number;
-  x: number;
-  y: number;
-  size: number;
-  color: string;
-  delay: number;
-  duration: number;
-  rotation: number;
-  symbol: string;
-}
-
-const SYMBOLS = ['★', '✦', '♦', '◆', '✧', '⬥', '♠', '♣'];
-const COLORS = ['#f7d060', '#ffe066', '#ffd700', '#ff8c00', '#ff6b35', '#ff4444', '#e74c3c'];
-
-function createParticles(count: number): Particle[] {
-  return Array.from({ length: count }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: -10 - Math.random() * 20,
-    size: 8 + Math.random() * 12,
-    color: COLORS[Math.floor(Math.random() * COLORS.length)],
-    delay: Math.random() * 0.6,
-    duration: 1.5 + Math.random() * 1.5,
-    rotation: Math.random() * 360,
-    symbol: SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
-  }));
-}
-
-export default function VictoryAnimation({ points, missionTitle, onComplete }: VictoryAnimationProps) {
-  const [particles] = useState(() => createParticles(40));
-  const [phase, setPhase] = useState<'enter' | 'show' | 'exit'>('enter');
-  const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
-
-  useEffect(() => {
-    const showTimer = setTimeout(() => setPhase('show'), 100);
-    const exitTimer = setTimeout(() => setPhase('exit'), 3000);
-    const completeTimer = setTimeout(() => onCompleteRef.current?.(), 3800);
-    return () => {
-      clearTimeout(showTimer);
-      clearTimeout(exitTimer);
-      clearTimeout(completeTimer);
-    };
-  }, []);
+export default function VictoryAnimation({
+  points,
+  missionTitle,
+  onComplete,
+}: VictoryAnimationProps) {
+  const { phase } = useAnimationPhase(undefined, onComplete);
 
   return (
-    <div
-      className={`victory-overlay ${phase === 'exit' ? 'victory-exit' : ''}`}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        pointerEvents: 'all',
+    <ResultOverlay
+      phase={phase}
+      className="victory-overlay"
+      overlayStyle={{
+        background:
+          'radial-gradient(ellipse at center, rgba(201, 168, 76, 0.12) 0%, rgba(13, 26, 13, 0.92) 60%, rgba(13, 26, 13, 0.97) 100%)',
       }}
     >
-      {particles.map((p) => (
-        <span
-          key={p.id}
-          className="victory-particle"
-          style={{
-            position: 'absolute',
-            left: `${p.x}%`,
-            top: `${p.y}%`,
-            fontSize: `${p.size}px`,
-            color: p.color,
-            textShadow: `0 0 6px ${p.color}`,
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${p.duration}s`,
-            transform: `rotate(${p.rotation}deg)`,
-          }}
-        >
-          {p.symbol}
-        </span>
-      ))}
+      <ParticleEffect colors={VICTORY_COLORS} symbols={VICTORY_SYMBOLS} />
 
       <div className={`victory-content ${phase === 'show' ? 'victory-content-show' : ''}`}>
         <div className="victory-sword-icon">⚔</div>
@@ -101,6 +42,6 @@ export default function VictoryAnimation({ points, missionTitle, onComplete }: V
         </div>
         <div className="victory-divider">═══════════════</div>
       </div>
-    </div>
+    </ResultOverlay>
   );
 }

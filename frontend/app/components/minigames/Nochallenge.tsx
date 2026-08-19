@@ -69,7 +69,7 @@ export default function NoChallenge({
         }
 
         .minigame-modal {
-          background: linear-gradient(180deg, #1a1225 0%, #0d0a15 100%);
+          background: linear-gradient(180deg, #1a2a1a 0%, #0d150d 100%);
           border: 4px solid var(--gold);
           padding: 2rem;
           max-width: 380px;
@@ -150,7 +150,7 @@ export default function NoChallenge({
         .minigame-btn {
           font-family: 'Press Start 2P', monospace;
           font-size: 0.5rem;
-          background: linear-gradient(180deg, var(--btn-green) 0%, #1a4a1a 100%);
+          background: linear-gradient(180deg, var(--btn-green) 0%, #1a3a15 100%);
           color: var(--gold-bright);
           border: 2px solid var(--gold);
           padding: 0.75rem 1.5rem;
@@ -160,7 +160,7 @@ export default function NoChallenge({
         }
 
         .minigame-btn:hover:not(:disabled) {
-          background: linear-gradient(180deg, var(--btn-green-hover) 0%, #2a6a2a 100%);
+          background: linear-gradient(180deg, var(--btn-green-hover) 0%, #2a4a25 100%);
         }
 
         .minigame-btn:disabled {
@@ -169,12 +169,12 @@ export default function NoChallenge({
         }
 
         .minigame-btn-cancel {
-          background: linear-gradient(180deg, #555 0%, #333 100%);
-          border-color: #777;
+          background: linear-gradient(180deg, #4a4a3a 0%, #3a3a2a 100%);
+          border-color: #6a6a5a;
         }
 
         .minigame-btn-cancel:hover {
-          background: linear-gradient(180deg, #666 0%, #444 100%);
+          background: linear-gradient(180deg, #5a5a4a 0%, #4a4a3a 100%);
         }
       `}</style>
     </div>
