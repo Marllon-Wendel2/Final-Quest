@@ -1,0 +1,185 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: linear-gradient(180deg, #1a1225 0%, #0d0a15 100%);
+  border: 4px solid var(--gold);
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.9rem;
+  color: var(--gold-bright);
+  margin: 0 0 0.5rem 0;
+  text-shadow: 2px 2px 0 var(--parchment-dark);
+}
+
+.subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+.close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  line-height: 1;
+}
+
+.close:hover {
+  color: var(--gold);
+}
+
+.status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 10px currentColor;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-width: 280px;
+  margin: 0 auto 1.5rem;
+}
+
+.cell {
+  aspect-ratio: 1;
+  background: var(--bg-dark);
+  border: 3px solid var(--gold-dark);
+  color: var(--gold-bright);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.cell:hover:not(:disabled) {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(247, 208, 96, 0.3);
+}
+
+.cell:disabled {
+  cursor: not-allowed;
+}
+
+.cellX {
+  color: #4ade80;
+  text-shadow: 0 0 10px #4ade80;
+}
+
+.cellO {
+  color: #ef4444;
+  text-shadow: 0 0 10px #ef4444;
+}
+
+.cellBotLast {
+  animation: botPulse 0.5s ease-out;
+}
+
+@keyframes botPulse {
+  0% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.reward {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: var(--gold-bright);
+  margin-bottom: 1rem;
+}
+
+.rewardIcon {
+  font-size: 1rem;
+}
+
+.btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  background: linear-gradient(180deg, var(--btn-green) 0%, #1a4a1a 100%);
+  color: var(--gold-bright);
+  border: 2px solid var(--gold);
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  text-align: center;
+  transition: all 0.1s;
+}
+
+.btn:hover {
+  background: linear-gradient(180deg, var(--btn-green-hover) 0%, #2a6a2a 100%);
+}
+
+.btnClose {
+  background: linear-gradient(180deg, #cc3333 0%, #8b0000 100%);
+  border-color: #ff4444;
+}
+
+.btnClose:hover {
+  background: linear-gradient(180deg, #ff4444 0%, #cc0000 100%);
+}
+
+@media (max-width: 480px) {
+  .modal {
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 0.7rem;
+  }
+
+  .board {
+    max-width: 240px;
+  }
+
+  .cell {
+    font-size: 1.5rem;
+  }
+}
