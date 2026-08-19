@@ -19,11 +19,12 @@ export class MissionSeedService implements OnModuleInit {
     await this.prisma.mission.createMany({
       data: [
         {
-          title: 'Aperte o botão rápido',
+          title: 'Carregue sua energia!',
           description:
             'Aperte o botão antes que o tempo acabe (uma vez por minuto)',
           points: 5,
           frequency: 'MINUTE',
+          challengeType: 'NONE',
         },
 
         {
@@ -31,26 +32,32 @@ export class MissionSeedService implements OnModuleInit {
           description: 'Beba pelo menos um copo de água por hora',
           points: 5,
           frequency: 'HOUR',
+          challengeType: 'NONE',
         },
 
         {
-          title: 'Beba 4 litros de água',
-          description: 'Mantenha-se hidratado bebendo 4 litros de água',
+          title: 'Faça login',
+          description: 'Faça login no jogo para ganhar pontos',
           points: 10,
           frequency: 'DAILY',
+          challengeType: 'NONE',
         },
         {
-          title: 'Durma 7 horas',
+          title: 'Um goblim lhe encontrou na floresta! Derrote ele!',
           description: 'Durma pelo menos 7 horas para restaurar energia',
           points: 15,
           frequency: 'DAILY',
+          challengeType: 'TIC_TAC_TOE',
         },
 
         {
-          title: 'Complete 3 treinos na semana',
-          description: 'Faça pelo menos 3 sessões de treino durante a semana',
+          title: 'SALVE SEUS AMIGOS',
+          description:
+            'Seu grupo encontrou uma mago, ele dividiu vocês em dois, achem suas metades para continuar a jornada!',
           points: 50,
-          frequency: 'WEEKLY',
+          frequency: 'ONCE',
+          challengeType: 'MEMORY',
+          maxCompletions: 5,
         },
 
         {
@@ -58,14 +65,17 @@ export class MissionSeedService implements OnModuleInit {
           description: 'Encontre e chegue na dungeon do jogo',
           points: 10,
           frequency: 'ONCE',
+          challengeType: 'NONE',
         },
 
         {
-          title: 'Derrote 5 goblins',
-          description: 'Vença 5 goblins em batalha (pode fazer 3 vezes)',
-          points: 20,
+          title: 'Derrote 3 goblins',
+          description:
+            'Três gomblis te encontraram nas florestas, derrote-os para ganhar pontos',
+          points: 50,
           frequency: 'ONCE',
           maxCompletions: 3,
+          challengeType: 'TIC_TAC_TOE',
         },
       ],
     });

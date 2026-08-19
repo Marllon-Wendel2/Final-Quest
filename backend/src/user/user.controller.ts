@@ -11,7 +11,13 @@ import {
   Delete,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { ApiTags, ApiOperation, ApiResponse, ApiCookieAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiCookieAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserPipe, type UpdateUserDto } from './dtos/user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -38,7 +44,12 @@ export class UserController {
 
   @Get('ranked')
   @ApiOperation({ summary: 'Obter usuários ranqueados' })
-  @ApiQuery({ name: 'limit', required: false, enum: [10, 20, 50], description: 'Limite de resultados' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    enum: [10, 20, 50],
+    description: 'Limite de resultados',
+  })
   @ApiResponse({ status: 200, description: 'Lista de usuários ranqueados' })
   getRankedUsers(@Query('limit') limit?: string) {
     const parsedLimit = limit ? parseInt(limit, 10) : 10;

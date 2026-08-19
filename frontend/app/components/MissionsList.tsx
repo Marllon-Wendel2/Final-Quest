@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { AvailableMission, completeMission, getAvailableMissions } from '../../api/player-mission';
 import VictoryAnimation from './VictoryAnimation';
 
+import ChallengeRouter from './minigames/ChallengeRouter';
+
 interface MissionsListProps {
   onMissionComplete?: () => void;
   bgAudioRef?: React.RefObject<HTMLAudioElement | null>;
@@ -59,6 +61,13 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
   const floatingIdCounter = useRef(0);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const [activeChallenge, setActiveChallenge] = useState<{
+    missionId: string;
+    challengeType: string;
+    title: string;
+    points: number;
+  } | null>(null);
+
   const fetchMissions = useCallback(() => {
     getAvailableMissions()
       .then((data) => {
@@ -110,7 +119,18 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
     }
   }, [countdowns, fetchMissions]);
 
-  const handleComplete = async (missionId: string, points: number, e: React.MouseEvent) => {
+  const handleComplete = async (
+    missionId: string,
+    points: number,
+    challengeType: string,
+    title: string,
+    e: React.MouseEvent,
+  ) => {
+    if (challengeType !== 'NONE') {
+      setActiveChallenge({ missionId, challengeType, title, points });
+      return;
+    }
+
     setCompletingId(missionId);
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const containerRect = containerRef.current?.getBoundingClientRect();
@@ -301,7 +321,7 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
                     <div className="quest-card-action">
                       {(!mission.isCompleted || (mission.frequency === 'ONCE' && mission.maxCompletions && mission.completionsCount < mission.maxCompletions)) ? (
                         <button
-                          onClick={(e) => handleComplete(mission.id, mission.points, e)}
+                          onClick={(e) => handleComplete(mission.id, mission.points, mission.challengeType, mission.title, e)}
                           disabled={completingId === mission.id}
                           className="quest-btn"
                         >
@@ -354,6 +374,24 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
       <div className="quest-log-footer">
         <div className="quest-footer-decoration">❧ ❦ ❧</div>
       </div>
+
+      {activeChallenge && (
+        <ChallengeRouter
+          challengeType={activeChallenge.challengeType}
+          missionId={activeChallenge.missionId}
+          missionTitle={activeChallenge.title}
+          points={activeChallenge.points}
+          onSuccess={() => {
+            const challenge = activeChallenge;
+            setActiveChallenge(null);
+            completeMission(challenge.missionId).then(() => {
+              fetchMissions();
+              onMissionComplete?.();
+            });
+          }}
+          onClose={() => setActiveChallenge(null)}
+        />
+      )}
 
       {victoryData && (
         <VictoryAnimation
