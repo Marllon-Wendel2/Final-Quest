@@ -36,8 +36,8 @@ export class MissionSeedService implements OnModuleInit {
         },
 
         {
-          title: 'Beba 4 litros de água',
-          description: 'Mantenha-se hidratado bebendo 4 litros de água',
+          title: 'Faça login',
+          description: 'Faça login no jogo para ganhar pontos',
           points: 10,
           frequency: 'DAILY',
           challengeType: 'NONE',
@@ -55,8 +55,9 @@ export class MissionSeedService implements OnModuleInit {
           description:
             'Seu grupo encontrou uma mago, ele dividiu vocês em dois, achem suas metades para continuar a jornada!',
           points: 50,
-          frequency: 'WEEKLY',
-          challengeType: 'NONE',
+          frequency: 'ONCE',
+          challengeType: 'MEMORY',
+          maxCompletions: 5,
         },
 
         {

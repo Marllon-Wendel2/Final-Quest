@@ -8,7 +8,12 @@ import {
   Request,
 } from '@nestjs/common';
 import type { Response } from 'express';
-import { ApiTags, ApiOperation, ApiResponse, ApiCookieAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiCookieAuth,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import type { RegisterDto } from './dto/register.dto';
 import { RegisterPipe } from './dto/register.dto.js';
