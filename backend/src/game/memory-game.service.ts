@@ -79,6 +79,13 @@ export class MemoryGameService {
     validateOwnership(game, userId);
     validateStatus(game, 'playing');
 
+    const now = Date.now();
+    const elapsed = Math.floor((now - game.lastTickAt) / 1000);
+    if (elapsed >= 1) {
+      game.timeLeft = Math.max(0, game.timeLeft - elapsed);
+      game.lastTickAt = now;
+    }
+
     if (cardIndex < 0 || cardIndex >= game.cards.length) {
       throw new BadRequestException('Índice de carta inválido');
     }
