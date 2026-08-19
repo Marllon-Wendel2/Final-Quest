@@ -3,6 +3,7 @@
 import MemoryGameHeader from './MemoryGameHeader';
 import MemoryGameStatus from './MemoryGameStatus';
 import MemoryGameBoard from './MemoryGameBoard';
+import MemoryGameLegend from './MemoryGameLegend';
 import MemoryGameFooter from './MemoryGameFooter';
 import styles from './MemoryGame.module.css';
 import { useMemoryGame } from '../../../../hooks/useMemoryGame';
@@ -56,6 +57,7 @@ export default function MemoryGame({
           onCardClick={handleCardClick}
           isProcessing={isProcessing}
         />
+        <MemoryGameLegend />
         <MemoryGameFooter points={points} status={status} onClose={onClose} />
       </div>
 

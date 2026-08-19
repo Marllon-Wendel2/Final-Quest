@@ -206,6 +206,57 @@
   opacity: 0.3;
 }
 
+.legend {
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.8rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--gold-dark);
+  border-radius: 4px;
+}
+
+.legendTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.4rem;
+  color: var(--text-dim);
+  display: block;
+  text-align: center;
+  margin-bottom: 0.4rem;
+}
+
+.legendItems {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legendIcon {
+  font-size: 0.85rem;
+}
+
+.legendTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.legendItemTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.35rem;
+  color: var(--gold-bright);
+}
+
+.legendItemDesc {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.3rem;
+  color: var(--text-dim);
+}
+
 .reward {
   display: flex;
   align-items: center;
@@ -267,6 +318,14 @@
 
   .card {
     font-size: 1.2rem;
+  }
+
+  .legendItems {
+    gap: 0.5rem;
+  }
+
+  .legendItemDesc {
+    font-size: 0.25rem;
   }
 
   .stats {
