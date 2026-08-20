@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { loadSprites } from '../animations/Phaser/player';
 
 export default class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -9,6 +10,8 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.tilemapTiledJSON('map', '/phazer/map/Conseguindo.json');
     this.load.image('Tiles_exterior', '/phazer/map/Tiles_exterior.png');
     this.load.image('water', '/phazer/map/water.png');
+
+    loadSprites(this);
   }
 
   create() {

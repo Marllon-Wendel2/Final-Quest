@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { createPlayer } from '../animations/Phaser/player';
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -13,5 +14,8 @@ export default class GameScene extends Phaser.Scene {
 
     map.createLayer('Grama', tilesExt!, 0, 0);
     map.createLayer('agua', water!, 0, 0);
+
+    const player = createPlayer(this);
+    this.cameras.main.startFollow(player);
   }
 }
