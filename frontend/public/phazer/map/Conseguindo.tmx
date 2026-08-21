@@ -1,10 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="38" height="27" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="38" height="27" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="16">
+ <editorsettings>
+  <export target="Conseguindo.json" format="json"/>
+ </editorsettings>
  <tileset firstgid="1" name="Tiles_exterior" tilewidth="16" tileheight="16" tilecount="432" columns="27">
-  <image source="map/Tiles_exterior.png" width="432" height="256"/>
+  <properties>
+   <property name="collider" type="bool" value="false"/>
+  </properties>
+  <image source="Tiles_exterior.png" width="432" height="256"/>
+  <tile id="109">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="110">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="111">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="217">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="218">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="219">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="433" name="water" tilewidth="16" tileheight="16" tilecount="1536" columns="128">
-  <image source="map/water.png" width="2048" height="192"/>
+  <image source="water.png" width="2048" height="192"/>
   <tile id="0">
    <properties>
     <property name="collider" type="bool" value="true"/>
@@ -7566,6 +7602,36 @@
    </properties>
   </tile>
  </tileset>
+ <tileset firstgid="1969" name="contrucoes" tilewidth="320" tileheight="320" tilecount="8" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image source="Blue Buildings/Monastery.png" width="192" height="320"/>
+  </tile>
+  <tile id="1">
+   <image source="Blue Buildings/Archery.png" width="192" height="256"/>
+  </tile>
+  <tile id="2">
+   <image source="Blue Buildings/Barracks.png" width="192" height="256"/>
+  </tile>
+  <tile id="3">
+   <image source="Blue Buildings/Tower.png" width="128" height="256"/>
+  </tile>
+  <tile id="4">
+   <image source="Blue Buildings/Castle.png" width="320" height="256"/>
+  </tile>
+  <tile id="5">
+   <image source="Blue Buildings/House1.png" width="128" height="192"/>
+  </tile>
+  <tile id="6">
+   <image source="Blue Buildings/House2.png" width="128" height="192"/>
+  </tile>
+  <tile id="7">
+   <image source="Blue Buildings/House3.png" width="128" height="192"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="1977" name="estradas" tilewidth="16" tileheight="16" tilecount="390" columns="15">
+  <image source="PNG_Tiled/Road1_grass.png" width="240" height="416"/>
+ </tileset>
  <layer id="1" name="Grama" width="38" height="27">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -7628,4 +7694,52 @@
 946,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,947
 </data>
  </layer>
+ <layer id="5" name="estradas" width="38" height="27">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,2235,0,0,0,0,2235,0,0,0,2234,2059,2060,2059,2060,2058,2059,2060,2058,2059,2060,2058,2059,2060,0,0,0,0,0,0,0,0,0,
+0,0,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,1999,2014,2144,2145,0,0,0,0,0,0,0,
+0,0,2340,2341,2342,2343,2342,2343,2340,2341,2342,2343,2340,2341,2342,2343,2340,2341,2342,2343,2340,2341,2342,2343,2340,2341,2342,2343,2014,2159,2160,0,0,0,0,0,0,0,
+0,0,2355,2356,2357,2358,2357,2358,2355,2356,2357,2358,2355,2356,2357,2358,2355,2356,2357,2358,2355,2356,2357,2358,2355,2356,2357,2223,2224,2144,2145,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2238,2239,2221,2222,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2253,2254,2236,2237,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2233,2221,2222,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2217,2218,2221,2222,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2217,2218,2221,2222,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2217,2218,2236,2237,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2217,2218,2221,2222,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2217,2218,2221,2222,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2217,2218,2236,2237,0,0,0,0,0,0,0,
+0,0,0,2323,2324,2325,2326,2278,2279,2280,2281,0,2323,2324,2325,2326,2327,2328,2329,2323,2324,2325,2326,2323,2324,2325,2326,2217,2218,2144,2145,0,0,0,0,0,0,0,
+0,0,0,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,2144,2145,0,0,0,0,0,0,0,
+0,0,0,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2159,2160,0,0,0,0,0,0,0,
+0,0,0,2353,2354,2355,2356,2357,2358,2359,2353,2354,2355,2356,2357,2358,2359,2353,2354,2355,2356,2357,2358,2353,2354,2355,2356,2357,2358,2359,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="6" name="animals">
+  <object id="14" name="cabra" x="60.6667" y="198">
+   <point/>
+  </object>
+  <object id="15" x="375.333" y="412">
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="4" name="buildings">
+  <object id="1" gid="1970" x="31" y="331" width="158.333" height="147.333"/>
+  <object id="7" gid="1974" x="20" y="144" width="87.3333" height="132"/>
+  <object id="8" gid="1974" x="95" y="144" width="87.3333" height="132"/>
+  <object id="9" gid="1974" x="172.333" y="144.667" width="87.3333" height="132"/>
+  <object id="10" gid="1976" x="176" y="333.333" width="117.333" height="132.667"/>
+  <object id="11" gid="1976" x="284" y="331.666" width="117.333" height="132.667"/>
+  <object id="13" gid="1975" x="467.333" y="154" width="105.333" height="144.667"/>
+ </objectgroup>
 </map>
