@@ -13,14 +13,14 @@ const buildingHitboxes: Record<number, { w: number, h: number, offsetY?: number 
 };
 
 export const loadBuildingImages = (scene: Phaser.Scene) => {
-  scene.load.image('building_0', '/phazer/map/Blue Buildings/Monastery.png');
-  scene.load.image('building_1', '/phazer/map/Blue Buildings/Archery.png');
-  scene.load.image('building_2', '/phazer/map/Blue Buildings/Barracks.png');
-  scene.load.image('building_3', '/phazer/map/Blue Buildings/Tower.png');
-  scene.load.image('building_4', '/phazer/map/Blue Buildings/Castle.png');
-  scene.load.image('building_5', '/phazer/map/Blue Buildings/House1.png');
-  scene.load.image('building_6', '/phazer/map/Blue Buildings/House2.png');
-  scene.load.image('building_7', '/phazer/map/Blue Buildings/House3.png');
+  scene.load.image('building_0', '/phaser/map/Blue Buildings/Monastery.png');
+  scene.load.image('building_1', '/phaser/map/Blue Buildings/Archery.png');
+  scene.load.image('building_2', '/phaser/map/Blue Buildings/Barracks.png');
+  scene.load.image('building_3', '/phaser/map/Blue Buildings/Tower.png');
+  scene.load.image('building_4', '/phaser/map/Blue Buildings/Castle.png');
+  scene.load.image('building_5', '/phaser/map/Blue Buildings/House1.png');
+  scene.load.image('building_6', '/phaser/map/Blue Buildings/House2.png');
+  scene.load.image('building_7', '/phaser/map/Blue Buildings/House3.png');
 };
 
 export const createBuildings = (

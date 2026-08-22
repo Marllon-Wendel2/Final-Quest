@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
 export const loadLambSprite = (scene: Phaser.Scene) => {
-    scene.load.spritesheet('lamb', 'phazer/map/Lamb_animation_with_shadow.png', {
+    scene.load.spritesheet('lamb', 'phaser/map/Lamb_animation_with_shadow.png', {
         frameWidth: 32,
         frameHeight: 32,
     });

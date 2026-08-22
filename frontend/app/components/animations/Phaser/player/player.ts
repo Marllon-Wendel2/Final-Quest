@@ -1,18 +1,18 @@
 import Phaser from 'phaser'
 export const loadSprites = (scene: Phaser.Scene) => {
-    scene.load.spritesheet("cultist_idle", '/phazer/Personagens/Cultist/Cultist1_Idle.png', {
+    scene.load.spritesheet("cultist_idle", '/phaser/Personagens/Cultist/Cultist1_Idle.png', {
         frameWidth: 32,
         frameHeight: 32,
         spacing:0
     });
 
-    scene.load.spritesheet("cultist_walk", '/phazer/Personagens/Cultist/Cultist1_Walk.png', {
+    scene.load.spritesheet("cultist_walk", '/phaser/Personagens/Cultist/Cultist1_Walk.png', {
         frameWidth: 32,
         frameHeight: 32,
         spacing:0
     });
 
-    scene.load.spritesheet("cultist_pray", '/phazer/Personagens/Cultist/Cultist1_Pray.png', {
+    scene.load.spritesheet("cultist_pray", '/phaser/Personagens/Cultist/Cultist1_Pray.png', {
         frameWidth: 32,
         frameHeight: 32,
         spacing:0
