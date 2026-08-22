@@ -4,6 +4,8 @@ import { configControls, createControls } from '../animations/Phaser/player/cont
 import { createLamb } from '../animations/Phaser/animes/lamb';
 import { createBuildings } from '../animations/Phaser/buildings/buildings';
 
+import UIScene from './ui/UIScene';
+
 export default class GameScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
   private controls!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -16,6 +18,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.cameras.main.setViewport(0, 0, 720, 620);
+
     const map = this.make.tilemap({ key: 'map' });
 
     const tilesExt = map.addTilesetImage('Tiles_exterior', 'Tiles_exterior');
@@ -30,6 +34,7 @@ export default class GameScene extends Phaser.Scene {
 
     if(!waterLayer) throw new Error('Water layer not found');
 
+    const ui = this.scene.get('UIScene') as UIScene;
 
     this.water = waterLayer as Phaser.Tilemaps.TilemapLayer;
     this.grass = grassLayer as Phaser.Tilemaps.TilemapLayer;
@@ -49,6 +54,13 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.houses);
     this.physics.collide(this.player, this.water);
     this.controls = createControls(this);
+
+    this.time.delayedCall(100, () => {
+      ui.playScript([
+        { type: 'text', text: 'Bem-vindo, Ocultista!' },
+        { type: 'text', text: 'Vá para o culto na próxima cidade!' },
+      ]);
+    });
   }
 
   update() {
