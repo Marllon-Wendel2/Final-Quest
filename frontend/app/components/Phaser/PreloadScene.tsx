@@ -9,10 +9,12 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.tilemapTiledJSON('map', '/phazer/map/Conseguindo.json');
-    this.load.image('Tiles_exterior', '/phazer/map/Tiles_exterior.png');
-    this.load.image('water', '/phazer/map/water.png');
-    this.load.image('estradas', '/phazer/map/PNG_Tiled/Road1_grass.png');
+    this.load.tilemapTiledJSON('map', '/phaser/map/Conseguindo.json');
+    this.load.image('Tiles_exterior', '/phaser/map/Tiles_exterior.png');
+    this.load.image('water', '/phaser/map/water.png');
+    this.load.image('estradas', '/phaser/map/PNG_Tiled/Road1_grass.png');
+
+    this.load.image('special_paper', '/phaser/UI/SpecialPaper.png');
 
     loadBuildingImages(this);
     loadLambSprite(this);
@@ -20,6 +22,7 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   create() {
+    this.scene.launch('UIScene'); 
     this.scene.start('GameScene');
   }
 }

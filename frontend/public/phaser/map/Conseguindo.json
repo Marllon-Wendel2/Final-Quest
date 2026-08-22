@@ -220,8 +220,8 @@
                  "type":"",
                  "visible":true,
                  "width":117.333,
-                 "x":176,
-                 "y":333.333
+                 "x":177.355,
+                 "y":331.966
                 }, 
                 {
                  "gid":1976,
@@ -233,8 +233,8 @@
                  "type":"",
                  "visible":true,
                  "width":117.333,
-                 "x":284,
-                 "y":331.666
+                 "x":288.645,
+                 "y":331.982
                 }, 
                 {
                  "gid":1975,
@@ -14016,37 +14016,73 @@
                  "id":0,
                  "image":"Blue Buildings\/Monastery.png",
                  "imageheight":320,
-                 "imagewidth":192
+                 "imagewidth":192,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }]
                 }, 
                 {
                  "id":1,
                  "image":"Blue Buildings\/Archery.png",
                  "imageheight":256,
-                 "imagewidth":192
+                 "imagewidth":192,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }]
                 }, 
                 {
                  "id":2,
                  "image":"Blue Buildings\/Barracks.png",
                  "imageheight":256,
-                 "imagewidth":192
+                 "imagewidth":192,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }]
                 }, 
                 {
                  "id":3,
                  "image":"Blue Buildings\/Tower.png",
                  "imageheight":256,
-                 "imagewidth":128
+                 "imagewidth":128,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }]
                 }, 
                 {
                  "id":4,
                  "image":"Blue Buildings\/Castle.png",
                  "imageheight":256,
-                 "imagewidth":320
+                 "imagewidth":320,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }]
                 }, 
                 {
                  "id":5,
                  "image":"Blue Buildings\/House1.png",
                  "imageheight":192,
-                 "imagewidth":128
+                 "imagewidth":128,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }]
                 }, 
                 {
                  "id":6,

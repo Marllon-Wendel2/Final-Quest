@@ -7605,21 +7605,39 @@
  <tileset firstgid="1969" name="contrucoes" tilewidth="320" tileheight="320" tilecount="8" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="0">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
    <image source="Blue Buildings/Monastery.png" width="192" height="320"/>
   </tile>
   <tile id="1">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
    <image source="Blue Buildings/Archery.png" width="192" height="256"/>
   </tile>
   <tile id="2">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
    <image source="Blue Buildings/Barracks.png" width="192" height="256"/>
   </tile>
   <tile id="3">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
    <image source="Blue Buildings/Tower.png" width="128" height="256"/>
   </tile>
   <tile id="4">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
    <image source="Blue Buildings/Castle.png" width="320" height="256"/>
   </tile>
   <tile id="5">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
    <image source="Blue Buildings/House1.png" width="128" height="192"/>
   </tile>
   <tile id="6">
@@ -7738,8 +7756,8 @@
   <object id="7" gid="1974" x="20" y="144" width="87.3333" height="132"/>
   <object id="8" gid="1974" x="95" y="144" width="87.3333" height="132"/>
   <object id="9" gid="1974" x="172.333" y="144.667" width="87.3333" height="132"/>
-  <object id="10" gid="1976" x="176" y="333.333" width="117.333" height="132.667"/>
-  <object id="11" gid="1976" x="284" y="331.666" width="117.333" height="132.667"/>
+  <object id="10" gid="1976" x="177.355" y="331.966" width="117.333" height="132.667"/>
+  <object id="11" gid="1976" x="288.645" y="331.982" width="117.333" height="132.667"/>
   <object id="13" gid="1975" x="467.333" y="154" width="105.333" height="144.667"/>
  </objectgroup>
 </map>
