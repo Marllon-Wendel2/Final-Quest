@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import { loadSprites } from '../animations/Phaser/player/player';
 import { loadLambSprite } from '../animations/Phaser/animes/lamb';
 import { loadBuildingImages } from '../animations/Phaser/buildings/buildings';
+import { loadGhostSprite } from '../animations/Phaser/animes/ghost';
+import { loadBridges } from '../animations/Phaser/bridges/bridges';
 
 export default class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -17,9 +19,12 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('special_paper', '/phaser/UI/SpecialPaper.png');
     this.load.audio('door_locked', '/SoundsEffects/macaneta.wav');
 
+
     loadBuildingImages(this);
     loadLambSprite(this);
+    loadGhostSprite(this)
     loadSprites(this);
+    loadBridges(this)
   }
 
   create() {

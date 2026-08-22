@@ -3,7 +3,8 @@ import { createPlayer } from '../animations/Phaser/player/player';
 import { configControls, createControls } from '../animations/Phaser/player/controls';
 import { createLamb } from '../animations/Phaser/animes/lamb';
 import { createBuildings } from '../animations/Phaser/buildings/buildings';
-import { createDoors, Door } from '../animations/Phaser/doors/door'; 
+import { createDoors, Door } from '../animations/Phaser/doors/door';
+import { createGhost } from '../animations/Phaser/animes/ghost';
 
 import UIScene from './ui/UIScene';
 
@@ -17,6 +18,7 @@ export default class GameScene extends Phaser.Scene {
   private doors: Door[] = [];
   private activeDoor: Door | null = null;
   private interactKey!: Phaser.Input.Keyboard.Key;
+  private ghost!: ReturnType<typeof createGhost>;
 
   constructor() {
     super('GameScene');
@@ -30,12 +32,11 @@ export default class GameScene extends Phaser.Scene {
     const tilesExt = map.addTilesetImage('Tiles_exterior', 'Tiles_exterior');
     const tileWater = map.addTilesetImage('water', 'water');
     const tileRoad = map.addTilesetImage('estradas', 'estradas');
-
-
+    const bridgesTileset = map.addTilesetImage('Bridges', 'Bridges');
     
     const grassLayer = map.createLayer('Grama', tilesExt!, 0, 0);
     const waterLayer = map.createLayer('agua', tileWater!, 0, 0);
-    map.createLayer('estradas', tileRoad!, 0, 0);
+    map.createLayer('estradas', [tileRoad!, bridgesTileset!], 0, 0);
 
     if(!waterLayer) throw new Error('Water layer not found');
 
@@ -57,6 +58,14 @@ export default class GameScene extends Phaser.Scene {
 
     this.doors = createDoors(this, map);
 
+    const npcLayer = map.getObjectLayer('NPC');
+    if (npcLayer) {
+      npcLayer.objects.forEach((obj) => {
+        if (obj.name === 'Fantasma' && obj.x !== undefined && obj.y !== undefined) {
+          this.ghost = createGhost(this, obj.x, obj.y);
+        }
+      });
+    }
 
     this.physics.add.collider(this.player, this.houses);
     this.physics.collide(this.player, this.water);
@@ -68,10 +77,15 @@ export default class GameScene extends Phaser.Scene {
     
     this.doors.forEach((door) => {
       this.physics.add.overlap(this.player, door.zone, () => {
-        // Callback chamado ENQUANTO o jogador esta sobre a zona
         this.activeDoor = door;
       });
     });
+
+    if (this.ghost) {
+      this.physics.add.collider(this.player, this.ghost.zone, () => {
+        this.ghost.show();
+      });
+    }
     this.time.delayedCall(100, () => {
       ui.playScript([
         { type: 'text', text: 'Bem-vindo, Ocultista!' },
@@ -114,6 +128,18 @@ export default class GameScene extends Phaser.Scene {
     });
     if (!isOverlapping) {
       this.activeDoor = null;
+    }
+
+    if (this.ghost) {
+      const bounds = this.ghost.zone.getBounds();
+      const playerBounds = this.player.getBounds();
+      const isOverGhost = Phaser.Geom.Intersects.RectangleToRectangle(
+        playerBounds,
+        bounds
+      );
+      if (!isOverGhost) {
+        this.ghost.hide();
+      }
     }
   }
 }
