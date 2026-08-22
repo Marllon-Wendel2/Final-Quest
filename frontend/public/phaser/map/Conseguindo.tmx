@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="38" height="27" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="16">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="38" height="27" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="23">
  <editorsettings>
   <export target="Conseguindo.json" format="json"/>
  </editorsettings>
@@ -7747,17 +7747,49 @@
   <object id="14" name="cabra" x="60.6667" y="198">
    <point/>
   </object>
-  <object id="15" x="375.333" y="412">
-   <point/>
-  </object>
  </objectgroup>
  <objectgroup id="4" name="buildings">
   <object id="1" gid="1970" x="31" y="331" width="158.333" height="147.333"/>
-  <object id="7" gid="1974" x="20" y="144" width="87.3333" height="132"/>
-  <object id="8" gid="1974" x="95" y="144" width="87.3333" height="132"/>
-  <object id="9" gid="1974" x="172.333" y="144.667" width="87.3333" height="132"/>
+  <object id="7" gid="1974" x="16" y="144" width="87.3333" height="132"/>
+  <object id="8" gid="1974" x="96" y="144" width="87.3333" height="132"/>
+  <object id="9" gid="1974" x="176" y="144" width="87.3333" height="132"/>
   <object id="10" gid="1976" x="177.355" y="331.966" width="117.333" height="132.667"/>
   <object id="11" gid="1976" x="288.645" y="331.982" width="117.333" height="132.667"/>
   <object id="13" gid="1975" x="467.333" y="154" width="105.333" height="144.667"/>
+  <object id="16" name="Porta-2" x="140" y="124">
+   <properties>
+    <property name="isOpen" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="17" name="Porta-1" x="60" y="124">
+   <properties>
+    <property name="isOpen" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="18" name="Porta-3" x="219" y="122">
+   <properties>
+    <property name="isOpen" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="19" name="Porta-4" x="492.407" y="124.391">
+   <properties>
+    <property name="isOpen" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="20" name="Porta-5" x="145.015" y="314.522">
+   <properties>
+    <property name="isOpen" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="7" name="NPC">
+  <object id="22" name="Fantasma" x="467.915" y="355.77">
+   <point/>
+  </object>
  </objectgroup>
 </map>

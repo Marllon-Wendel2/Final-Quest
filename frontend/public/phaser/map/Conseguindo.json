@@ -133,19 +133,6 @@
                  "width":0,
                  "x":60.6667,
                  "y":198
-                }, 
-                {
-                 "height":0,
-                 "id":15,
-                 "name":"",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":375.333,
-                 "y":412
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -181,7 +168,7 @@
                  "type":"",
                  "visible":true,
                  "width":87.3333,
-                 "x":20,
+                 "x":16,
                  "y":144
                 }, 
                 {
@@ -194,7 +181,7 @@
                  "type":"",
                  "visible":true,
                  "width":87.3333,
-                 "x":95,
+                 "x":96,
                  "y":144
                 }, 
                 {
@@ -207,8 +194,8 @@
                  "type":"",
                  "visible":true,
                  "width":87.3333,
-                 "x":172.333,
-                 "y":144.667
+                 "x":176,
+                 "y":144
                 }, 
                 {
                  "gid":1976,
@@ -248,6 +235,125 @@
                  "width":105.333,
                  "x":467.333,
                  "y":154
+                }, 
+                {
+                 "height":0,
+                 "id":16,
+                 "name":"Porta-2",
+                 "opacity":1,
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isOpen",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":140,
+                 "y":124
+                }, 
+                {
+                 "height":0,
+                 "id":17,
+                 "name":"Porta-1",
+                 "opacity":1,
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isOpen",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":60,
+                 "y":124
+                }, 
+                {
+                 "height":0,
+                 "id":18,
+                 "name":"Porta-3",
+                 "opacity":1,
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isOpen",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":219,
+                 "y":122
+                }, 
+                {
+                 "height":0,
+                 "id":19,
+                 "name":"Porta-4",
+                 "opacity":1,
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isOpen",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":492.407,
+                 "y":124.391
+                }, 
+                {
+                 "height":0,
+                 "id":20,
+                 "name":"Porta-5",
+                 "opacity":1,
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isOpen",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":145.015,
+                 "y":314.522
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":7,
+         "name":"NPC",
+         "objects":[
+                {
+                 "height":0,
+                 "id":22,
+                 "name":"Fantasma",
+                 "opacity":1,
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":467.915,
+                 "y":355.77
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -255,8 +361,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":7,
- "nextobjectid":16,
+ "nextlayerid":8,
+ "nextobjectid":23,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

@@ -15,6 +15,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('estradas', '/phaser/map/PNG_Tiled/Road1_grass.png');
 
     this.load.image('special_paper', '/phaser/UI/SpecialPaper.png');
+    this.load.audio('door_locked', '/SoundsEffects/macaneta.wav');
 
     loadBuildingImages(this);
     loadLambSprite(this);
