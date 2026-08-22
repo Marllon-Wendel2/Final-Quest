@@ -4,6 +4,9 @@ import { loadLambSprite } from '../animations/Phaser/animes/lamb';
 import { loadBuildingImages } from '../animations/Phaser/buildings/buildings';
 import { loadGhostSprite } from '../animations/Phaser/animes/ghost';
 import { loadBridges } from '../animations/Phaser/bridges/bridges';
+import { loadTilemap } from '../animations/Phaser/map/tilemap';
+import { loadUI } from '../animations/Phaser/ui/ui';
+import { loadAudio } from '../animations/Phaser/audio/audio';
 
 export default class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -11,20 +14,14 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.tilemapTiledJSON('map', '/phaser/map/Conseguindo.json');
-    this.load.image('Tiles_exterior', '/phaser/map/Tiles_exterior.png');
-    this.load.image('water', '/phaser/map/water.png');
-    this.load.image('estradas', '/phaser/map/PNG_Tiled/Road1_grass.png');
-
-    this.load.image('special_paper', '/phaser/UI/SpecialPaper.png');
-    this.load.audio('door_locked', '/SoundsEffects/macaneta.wav');
-
-
+    loadTilemap(this);
+    loadUI(this);
+    loadAudio(this);
     loadBuildingImages(this);
     loadLambSprite(this);
-    loadGhostSprite(this)
+    loadGhostSprite(this);
     loadSprites(this);
-    loadBridges(this)
+    loadBridges(this);
   }
 
   create() {
