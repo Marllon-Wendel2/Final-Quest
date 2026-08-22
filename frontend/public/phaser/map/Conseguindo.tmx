@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="38" height="27" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="23">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="38" height="27" tilewidth="16" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="28">
  <editorsettings>
   <export target="Conseguindo.json" format="json"/>
  </editorsettings>
@@ -7650,6 +7650,212 @@
  <tileset firstgid="1977" name="estradas" tilewidth="16" tileheight="16" tilecount="390" columns="15">
   <image source="PNG_Tiled/Road1_grass.png" width="240" height="416"/>
  </tileset>
+ <tileset firstgid="2367" name="Trees" tilewidth="16" tileheight="16" tilecount="442" columns="17">
+  <image source="../../../../../../Documentos/map/Trees_grass_alternative_fit.png" width="272" height="416"/>
+ </tileset>
+ <tileset firstgid="2809" name="Bridges" tilewidth="16" tileheight="16" tilecount="1722" columns="41">
+  <image source="Bridges.png" width="656" height="672"/>
+  <tile id="779">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="782">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="820">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="821">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="822">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="823">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="861">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="862">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="863">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="864">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="902">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="903">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="904">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="905">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="943">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="944">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="945">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="946">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="984">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="985">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="986">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="987">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1025">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1026">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1027">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1028">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1066">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1067">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1068">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1069">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1107">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1108">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1109">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1110">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1148">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1149">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1150">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1151">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1189">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1192">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
  <layer id="1" name="Grama" width="38" height="27">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -7676,9 +7882,9 @@
 0,56,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,58,0,
 0,56,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,58,0,
 0,56,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,165,58,0,
-0,83,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,85,0,
-0,110,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,112,0,
-0,110,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,112,0
+0,83,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,0,0,0,0,0,84,84,84,84,84,84,85,0,
+0,110,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,0,0,0,0,0,111,111,111,111,111,111,112,0,
+0,110,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,0,0,0,0,0,111,111,111,111,111,111,112,0
 </data>
  </layer>
  <layer id="2" name="agua" width="38" height="27">
@@ -7709,7 +7915,7 @@
 704,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,697,
 704,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,697,
 704,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,697,
-946,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,947
+946,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,436,0,0,0,0,0,436,436,436,436,436,436,436,947
 </data>
  </layer>
  <layer id="5" name="estradas" width="38" height="27">
@@ -7737,10 +7943,10 @@
 0,0,0,2323,2324,2325,2326,2278,2279,2280,2281,0,2323,2324,2325,2326,2327,2328,2329,2323,2324,2325,2326,2323,2324,2325,2326,2217,2218,2144,2145,0,0,0,0,0,0,0,
 0,0,0,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,1994,2144,2145,0,0,0,0,0,0,0,
 0,0,0,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2159,2160,0,0,0,0,0,0,0,
-0,0,0,2353,2354,2355,2356,2357,2358,2359,2353,2354,2355,2356,2357,2358,2359,2353,2354,2355,2356,2357,2358,2353,2354,2355,2356,2357,2358,2359,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,2353,2354,2355,2356,2357,2358,2359,2353,2354,2355,2356,2357,2358,2359,2353,2354,2355,2356,2357,2358,2353,3629,3630,3883,3883,3883,3631,3632,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3670,3671,3883,3883,3883,3672,3673,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3711,3712,3883,3881,3881,3713,3714,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3752,3753,3883,3883,3883,3754,3755,0,0,0,0,0,0,0
 </data>
  </layer>
  <objectgroup id="6" name="animals">
@@ -7753,8 +7959,8 @@
   <object id="7" gid="1974" x="16" y="144" width="87.3333" height="132"/>
   <object id="8" gid="1974" x="96" y="144" width="87.3333" height="132"/>
   <object id="9" gid="1974" x="176" y="144" width="87.3333" height="132"/>
-  <object id="10" gid="1976" x="177.355" y="331.966" width="117.333" height="132.667"/>
-  <object id="11" gid="1976" x="288.645" y="331.982" width="117.333" height="132.667"/>
+  <object id="10" gid="1976" x="192" y="336" width="117.333" height="132.667"/>
+  <object id="11" gid="1976" x="304" y="336" width="117.333" height="132.667"/>
   <object id="13" gid="1975" x="467.333" y="154" width="105.333" height="144.667"/>
   <object id="16" name="Porta-2" x="140" y="124">
    <properties>
@@ -7787,8 +7993,56 @@
    <point/>
   </object>
  </objectgroup>
+ <layer id="8" name="threes" width="38" height="27">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2368,2369,2370,2371,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2384,2385,2386,2387,2388,0,0,0,0,0,2564,2565,2566,2567,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2401,2402,2403,2404,2405,0,0,0,0,0,2581,2582,2583,2584,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2418,2419,2420,2421,2422,0,0,0,0,0,2598,2599,2600,2601,0,0,0,0,0,0,0,0,
+0,2673,2674,2675,0,0,0,0,0,0,0,2673,2674,2675,0,0,0,2436,2437,2438,2439,0,0,0,0,0,2615,2616,2617,2618,0,0,0,0,0,0,0,0,
+0,2690,2691,2692,0,0,0,2761,2762,2761,2762,2690,2691,2692,0,0,0,2453,2454,2455,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,2707,2708,2709,0,0,0,2778,2779,2778,2779,2707,2708,2709,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2564,2565,2566,2567,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2581,2582,2583,2584,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2598,2599,2600,2601,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2615,2616,2617,2618,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2568,2569,2570,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2585,2586,2587,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2602,2603,2604,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,2673,2674,2675,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,2690,2691,2692,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2368,2369,2370,2371,0,0,0,
+0,0,2707,2708,2709,0,0,0,0,2761,2762,0,0,0,0,0,0,2728,2729,2728,2729,2728,2729,2728,2729,0,0,0,0,0,2384,2385,2386,2387,2388,0,0,0,
+0,0,0,0,0,0,0,0,0,2761,2762,2761,2762,0,0,0,0,2745,2746,2745,2746,2745,2746,2745,2746,0,0,0,0,0,2401,2402,2403,2404,2405,0,0,0,
+0,0,0,0,0,0,0,0,0,2778,2779,2778,2779,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2418,2419,2420,2421,2422,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2436,2437,2438,2439,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2453,2454,2455,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="9" name="minerais">
+  <object id="23" name="gold" x="184" y="41">
+   <point/>
+  </object>
+  <object id="24" name="gold" x="571" y="39">
+   <point/>
+  </object>
+  <object id="25" name="gold" x="569" y="249">
+   <point/>
+  </object>
+  <object id="26" name="gold" x="567" y="378">
+   <point/>
+  </object>
+  <object id="27" name="gold" x="72" y="382">
+   <point/>
+  </object>
+ </objectgroup>
  <objectgroup id="7" name="NPC">
-  <object id="22" name="Fantasma" x="467.915" y="355.77">
+  <object id="22" name="Fantasma" x="440" y="400">
    <point/>
   </object>
  </objectgroup>
