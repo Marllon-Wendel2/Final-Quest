@@ -7,9 +7,9 @@ const buildingHitboxes: Record<number, { w: number, h: number, offsetY?: number 
     2: { w: 140, h: 220 },               // Barracks
     3: { w: 100, h: 220 },               // Tower
     4: { w: 280, h: 220 },               // Castle
-    5: { w: 70,  h: 40, offsetY: 30 },  // House1
-    6: { w: 90,  h: 50, offsetY: 30 },  // House2
-    7: { w: 90,  h: 50, offsetY: 30 },  // House3
+    5: { w: 70,  h: 52, offsetY: 30 },  // House1
+    6: { w: 90,  h: 70, offsetY: 30 },  // House2
+    7: { w: 90,  h: 70, offsetY: 30 },  // House3
 };
 
 export const loadBuildingImages = (scene: Phaser.Scene) => {

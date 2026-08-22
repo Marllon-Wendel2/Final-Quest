@@ -87,6 +87,8 @@ export const createAnimations = (scene: Phaser.Scene) => {
 
 export const createPlayer = (scene: Phaser.Scene, x: number = 100, y: number = 100, direction: string = 'down') => {
     const player = scene.physics.add.sprite(x, y, 'cultist_idle');
+    player.body?.setSize(20, 16);
+    player.body?.setOffset(6, 16);
     createAnimations(scene);
     player.setData('direction', direction);
     player.play(`cultist-idle-${direction}`);
