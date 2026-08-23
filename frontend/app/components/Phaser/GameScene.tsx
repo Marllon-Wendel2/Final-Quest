@@ -25,7 +25,7 @@ export default class GameScene extends Phaser.Scene {
       this.cameras.main.setViewport(0, 0, 720, 620);
       // 1. Setup do mapa
       this.mapManager = new MapManager(this);
-      const { map, grassLayer, waterLayer } = this.mapManager.create();
+      const { map, grassLayer, waterLayer, roadsLayer } = this.mapManager.create();
       // 2. Criacao de entidades
       this.entityManager = new EntityManager(this);
       this.player = this.entityManager.createPlayer(150, 360, 'right');
@@ -44,6 +44,7 @@ export default class GameScene extends Phaser.Scene {
       // 4. Configurar colisoes
       this.physics.add.collider(this.player, waterLayer);
       this.physics.add.collider(this.player, grassLayer);
+      this.physics.add.collider(this.player, roadsLayer);
       this.physics.add.collider(this.player, buildings);
       
       // 5. Configurar interacoes
@@ -68,8 +69,11 @@ export default class GameScene extends Phaser.Scene {
     }
 
     update() {
-      // Controle de movimento
-      configControls(this.player, this.controls, this);
+      // Controle de movimento (travado enquanto dialogo esta ativo)
+      const ui = this.scene.get('UIScene') as UIScene;
+      if (!ui.getIsPlaying()) {
+        configControls(this.player, this.controls, this);
+      }
       // Atualizar interacoes
       this.interactionManager.update(this.player, this.doors, this.ghost);
     }

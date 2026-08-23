@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { DialogueBox } from './DialogueBox';
 import { DialogueScript, DialogueStep } from './dialogue-types';
+import { FONT_FAMILY, COLOR_HEX } from './FontManager';
 
 export default class UIScene extends Phaser.Scene {
   private dialogueBox!: DialogueBox;
@@ -8,6 +9,7 @@ export default class UIScene extends Phaser.Scene {
   private isWaitingForInput = false;
   private dialogueQueue: DialogueStep[] = [];
   private isPlaying = false;
+  private pressZText!: Phaser.GameObjects.Text;
 
   constructor() {
     super('UIScene');
@@ -30,6 +32,12 @@ export default class UIScene extends Phaser.Scene {
     this.dialogueBox = new DialogueBox(this, 130, 480);
     this.add.existing(this.dialogueBox);
 
+    this.pressZText = this.add.text(this.scale.width -150, 500, 'Pressione "Z"', {
+      fontFamily: FONT_FAMILY,
+      fontSize: '10px',
+      color: COLOR_HEX['font_white'],
+    }).setOrigin(1, 1).setAlpha(0);
+
     if (this.input.keyboard) {
       this.zKey = this.input.keyboard.addKey('Z');
       this.input.keyboard.on('keydown-Z', this.onZPressed, this);
@@ -37,6 +45,7 @@ export default class UIScene extends Phaser.Scene {
 
     this.events.on('typewriter-complete', () => {
       this.isWaitingForInput = true;
+      this.pressZText.setAlpha(1);
     });
   }
 
@@ -49,6 +58,7 @@ export default class UIScene extends Phaser.Scene {
   private processNextStep(): void {
     if (this.dialogueQueue.length === 0) {
       this.isPlaying = false;
+      this.pressZText.setAlpha(0);
       return;
     }
 
@@ -57,6 +67,7 @@ export default class UIScene extends Phaser.Scene {
     switch (step.type) {
       case 'text':
         this.isWaitingForInput = false;
+        this.pressZText.setAlpha(0);
         this.dialogueBox.show(step.text, step.color);
         break;
 
@@ -76,6 +87,7 @@ export default class UIScene extends Phaser.Scene {
   private onZPressed() {
     if (this.isWaitingForInput) {
       this.isWaitingForInput = false;
+      this.pressZText.setAlpha(0);
 
       if (this.isPlaying && this.dialogueQueue.length > 0) {
         this.processNextStep();
@@ -84,5 +96,9 @@ export default class UIScene extends Phaser.Scene {
         this.isPlaying = false;
       }
     }
+  }
+
+  getIsPlaying(): boolean {
+    return this.isPlaying;
   }
 }

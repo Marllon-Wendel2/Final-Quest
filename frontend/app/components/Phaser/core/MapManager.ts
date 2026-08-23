@@ -4,6 +4,7 @@ export interface MapLayers {
   map: Phaser.Tilemaps.Tilemap;
   grassLayer: Phaser.Tilemaps.TilemapLayer;
   waterLayer: Phaser.Tilemaps.TilemapLayer;
+  roadsLayer: Phaser.Tilemaps.TilemapLayer;
 }
 
 export class MapManager {
@@ -21,14 +22,16 @@ export class MapManager {
     // Cria layers
     const grassLayer = map.createLayer('Grama', tilesExt!, 0, 0);
     const waterLayer = map.createLayer('agua', tileWater!, 0, 0);
-    map.createLayer('estradas', [tileRoad!, bridgesTileset!], 0, 0);
+    const roadsLayer = map.createLayer('estradas', [tileRoad!, bridgesTileset!], 0, 0);
     if (!grassLayer) throw new Error('Grass layer not found');
     if (!waterLayer) throw new Error('Water layer not found');
     // Configura colisoes
     const water = waterLayer as Phaser.Tilemaps.TilemapLayer;
     const grass = grassLayer as Phaser.Tilemaps.TilemapLayer;
+    const roads = roadsLayer as Phaser.Tilemaps.TilemapLayer;
     water.setCollisionByProperty({ collider: true });
     grass.setCollisionByProperty({ collider: true });
-    return { map, grassLayer: grass, waterLayer: water };
+    roads.setCollisionByProperty({ collider: true });
+    return { map, grassLayer: grass, waterLayer: water, roadsLayer: roads };
   }
 }

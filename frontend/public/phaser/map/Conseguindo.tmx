@@ -7667,22 +7667,22 @@
   </tile>
   <tile id="820">
    <properties>
-    <property name="collider" type="bool" value="true"/>
+    <property name="collider" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="821">
    <properties>
-    <property name="collider" type="bool" value="true"/>
+    <property name="collider" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="822">
    <properties>
-    <property name="collider" type="bool" value="true"/>
+    <property name="collider" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="823">
    <properties>
-    <property name="collider" type="bool" value="true"/>
+    <property name="collider" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="861">
@@ -7945,7 +7945,7 @@
 0,0,0,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2159,2160,0,0,0,0,0,0,0,
 0,0,0,2353,2354,2355,2356,2357,2358,2359,2353,2354,2355,2356,2357,2358,2359,2353,2354,2355,2356,2357,2358,2353,3629,3630,3883,3883,3883,3631,3632,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3670,3671,3883,3883,3883,3672,3673,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3711,3712,3883,3881,3881,3713,3714,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3711,3712,3883,3881,3881,3713,3714,0,3303,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3752,3753,3883,3883,3883,3754,3755,0,0,0,0,0,0,0
 </data>
  </layer>
