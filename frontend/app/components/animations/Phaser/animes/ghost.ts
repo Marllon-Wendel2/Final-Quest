@@ -52,6 +52,7 @@ export const createGhost = (scene: Phaser.Scene, x: number, y: number) => {
     const overlap = scene.add.zone(x, y, OVERLAP_SIZE * 2, OVERLAP_SIZE * 2);
     scene.physics.add.existing(overlap, true);
 
+    const originalY = y - 25;
     let isAlive = false;
     let isDying = false;
 
@@ -82,6 +83,8 @@ export const createGhost = (scene: Phaser.Scene, x: number, y: number) => {
 
         isDying = true;
         ghost.stop();
+        scene.tweens.killTweensOf(ghost);
+        ghost.y = originalY;
         ghost.play('ghost-death');
 
         ghost.once('animationcomplete-ghost-death', () => {
