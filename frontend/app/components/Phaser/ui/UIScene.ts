@@ -19,7 +19,7 @@ export default class UIScene extends Phaser.Scene {
   create() {
     this.cameras.main.setViewport(0, 0, this.scale.width, this.scale.height);
 
-    const panelX = this.scale.width / 2;
+    const panelX = this.scale.width / 2 - 40;
     const panelY = 560;
 
     this.add.nineslice(
@@ -33,7 +33,7 @@ export default class UIScene extends Phaser.Scene {
     this.dialogueBox = new DialogueBox(this, 130, 480);
     this.add.existing(this.dialogueBox);
 
-    this.pressZText = this.add.text(this.scale.width -150, 500, 'Pressione "Z"', {
+    this.pressZText = this.add.text(this.scale.width - 200, 500, 'Pressione "Z"', {
       fontFamily: FONT_FAMILY,
       fontSize: '10px',
       color: COLOR_HEX['font_white'],
