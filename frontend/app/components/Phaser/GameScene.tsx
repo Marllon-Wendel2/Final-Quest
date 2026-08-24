@@ -27,13 +27,15 @@ export default class GameScene extends Phaser.Scene {
       this.cameras.main.setViewport(0, 0, 720, 620);
       // 1. Setup do mapa
       this.mapManager = new MapManager(this);
-      const { map, grassLayer, waterLayer, roadsLayer } = this.mapManager.create();
+      const { map, grassLayer, waterLayer, roadsLayer, treesLayer } = this.mapManager.create();
       // 2. Criacao de entidades
       this.entityManager = new EntityManager(this);
       this.player = this.entityManager.createPlayer(150, 360, 'right');
       const buildings = this.entityManager.createBuildings(map);
       this.entityManager.createLamb(60.67, 198);
       this.doors = this.entityManager.createDoors(map);
+      // Criar minerais
+      this.entityManager.createMinerals(map);
       // 3. Criar ghost (precisa de logica especial para NPC layer)
       const npcLayer = map.getObjectLayer('NPC');
       if (npcLayer) {
@@ -47,6 +49,7 @@ export default class GameScene extends Phaser.Scene {
       this.physics.add.collider(this.player, waterLayer);
       this.physics.add.collider(this.player, grassLayer);
       this.physics.add.collider(this.player, roadsLayer);
+      if (treesLayer) this.physics.add.collider(this.player, treesLayer);
       this.physics.add.collider(this.player, buildings);
       
       // 5. Configurar interacoes

@@ -6,6 +6,7 @@ import { loadGhostSprite } from '../animations/Phaser/animes/ghost';
 import { loadBridges } from '../animations/Phaser/bridges/bridges';
 import { loadTilemap } from '../animations/Phaser/map/tilemap';
 import { loadUI, loadInventory } from '../animations/Phaser/ui/ui';
+import { loadGoldSprite } from '../animations/Phaser/minerals/gold';
 import { loadAudio } from '../animations/Phaser/audio/audio';
 
 export default class PreloadScene extends Phaser.Scene {
@@ -23,6 +24,7 @@ export default class PreloadScene extends Phaser.Scene {
     loadSprites(this);
     loadBridges(this);
     loadInventory(this);
+    loadGoldSprite(this);
   }
 
   create() {

@@ -5,4 +5,5 @@ export const loadTilemap = (scene: Phaser.Scene) => {
     scene.load.image('Tiles_exterior', '/phaser/map/Tiles_exterior.png');
     scene.load.image('water', '/phaser/map/water.png');
     scene.load.image('estradas', '/phaser/map/PNG_Tiled/Road1_grass.png');
+    scene.load.image('Trees', '/phaser/map/Trees_grass_alternative_fit.png');
 };

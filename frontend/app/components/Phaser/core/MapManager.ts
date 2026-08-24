@@ -5,6 +5,7 @@ export interface MapLayers {
   grassLayer: Phaser.Tilemaps.TilemapLayer;
   waterLayer: Phaser.Tilemaps.TilemapLayer;
   roadsLayer: Phaser.Tilemaps.TilemapLayer;
+  treesLayer: Phaser.Tilemaps.TilemapLayer;
 }
 
 export class MapManager {
@@ -19,10 +20,12 @@ export class MapManager {
     const tileWater = map.addTilesetImage('water', 'water');
     const tileRoad = map.addTilesetImage('estradas', 'estradas');
     const bridgesTileset = map.addTilesetImage('Bridges', 'Bridges');
+    const treesTileset = map.addTilesetImage('Trees', 'Trees');
     // Cria layers
     const grassLayer = map.createLayer('Grama', tilesExt!, 0, 0);
     const waterLayer = map.createLayer('agua', tileWater!, 0, 0);
     const roadsLayer = map.createLayer('estradas', [tileRoad!, bridgesTileset!], 0, 0);
+    const treesLayer = map.createLayer('threes', treesTileset!, 0, 0) as Phaser.Tilemaps.TilemapLayer;
     if (!grassLayer) throw new Error('Grass layer not found');
     if (!waterLayer) throw new Error('Water layer not found');
     // Configura colisoes
@@ -32,6 +35,7 @@ export class MapManager {
     water.setCollisionByProperty({ collider: true });
     grass.setCollisionByProperty({ collider: true });
     roads.setCollisionByProperty({ collider: true });
-    return { map, grassLayer: grass, waterLayer: water, roadsLayer: roads };
+    if (treesLayer) treesLayer.setCollisionByProperty({ collider: true });
+    return { map, grassLayer: grass, waterLayer: water, roadsLayer: roads, treesLayer };
   }
 }
