@@ -15,7 +15,8 @@ export const loadGhostSprite = (scene: Phaser.Scene) => {
     });
 };
 
-const TRIGGER_RADIUS = 25;
+const COLLIDER_SIZE = 20;
+const OVERLAP_SIZE = 30;
 
 export const createGhost = (scene: Phaser.Scene, x: number, y: number) => {
     scene.anims.create({
@@ -45,8 +46,11 @@ export const createGhost = (scene: Phaser.Scene, x: number, y: number) => {
     ghost.setScale(0.7);
     ghost.setFlipX(true);
 
-    const zone = scene.add.zone(x, y, TRIGGER_RADIUS * 2, TRIGGER_RADIUS * 2);
-    scene.physics.add.existing(zone, true);
+    const collider = scene.add.zone(x, y, COLLIDER_SIZE * 2, COLLIDER_SIZE * 2);
+    scene.physics.add.existing(collider, true);
+
+    const overlap = scene.add.zone(x, y, OVERLAP_SIZE * 2, OVERLAP_SIZE * 2);
+    scene.physics.add.existing(overlap, true);
 
     let isAlive = false;
     let isDying = false;
@@ -62,13 +66,13 @@ export const createGhost = (scene: Phaser.Scene, x: number, y: number) => {
             if (isAlive) {
                 ghost.play('ghost-idle');
                 scene.tweens.add({
-                targets: ghost,
-                y: ghost.y - 20,    // sobe 20 pixels
-                duration: 800,       // em 0.8 segundos
-                ease: 'Sine.easeInOut',  // suave
-                yoyo: true,          // volta para baixo (flutuacao)
-                repeat: -1,          // repete infinitamente
-            });
+                    targets: ghost,
+                    y: ghost.y - 20,
+                    duration: 800,
+                    ease: 'Sine.easeInOut',
+                    yoyo: true,
+                    repeat: -1,
+                });
             }
         });
     };
@@ -85,7 +89,7 @@ export const createGhost = (scene: Phaser.Scene, x: number, y: number) => {
             isAlive = false;
             isDying = false;
         });
-    };
+    }
 
-    return { ghost, zone, show, hide };
+    return { ghost, collider, overlap, show, hide, stop };
 };

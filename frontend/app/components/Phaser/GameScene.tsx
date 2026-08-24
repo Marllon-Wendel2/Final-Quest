@@ -7,6 +7,7 @@ import { InteractionManager } from './core/InteractionManager';
 import { Door } from '../animations/Phaser/doors/door';
 import UIScene from './ui/UIScene';
 import { createGhost } from '../animations/Phaser/animes/ghost';
+import { eventBus } from './core/EventBus';
 
 export default class GameScene extends Phaser.Scene {
     private player!: Phaser.Physics.Arcade.Sprite;
@@ -52,12 +53,19 @@ export default class GameScene extends Phaser.Scene {
       this.interactionManager.setupDoorInteraction(this.doors, this.player);
       if (this.ghost) {
         this.interactionManager.setupGhostProximity(this.ghost);
-        this.physics.add.collider(this.player, this.ghost.zone, () => {
+        this.physics.add.collider(this.player, this.ghost.collider);
+        this.physics.add.overlap(this.player, this.ghost.overlap, () => {
           this.interactionManager.onGhostCollide(this.ghost);
         });
       }
       // 6. Configurar input
       this.controls = createControls(this);
+
+      eventBus.on('dialogue:start', () => {
+        this.player.setVelocity(0, 0);
+        this.player.anims.stop();
+      });
+
       // 7. UI
       this.time.delayedCall(100, () => {
         const ui = this.scene.get('UIScene') as UIScene;
@@ -69,7 +77,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     update() {
-      // Controle de movimento (travado enquanto dialogo esta ativo)
+      // Controle de movimento (travado enquanto dialogo ou ghost ativo)
       const ui = this.scene.get('UIScene') as UIScene;
       if (!ui.getIsPlaying()) {
         configControls(this.player, this.controls, this);

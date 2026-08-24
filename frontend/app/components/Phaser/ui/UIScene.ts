@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { DialogueBox } from './DialogueBox';
 import { DialogueScript, DialogueStep } from './dialogue-types';
 import { FONT_FAMILY, COLOR_HEX } from './FontManager';
+import { eventBus } from '../core/EventBus';
 
 export default class UIScene extends Phaser.Scene {
   private dialogueBox!: DialogueBox;
@@ -52,6 +53,7 @@ export default class UIScene extends Phaser.Scene {
   playScript(script: DialogueScript): void {
     this.dialogueQueue = [...script];
     this.isPlaying = true;
+    eventBus.emit('dialogue:start')
     this.processNextStep();
   }
 
