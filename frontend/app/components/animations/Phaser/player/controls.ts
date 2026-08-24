@@ -11,7 +11,7 @@ export const createControls = (scene: Phaser.Scene): Phaser.Types.Input.Keyboard
 }
 
 export const configControls = (
-    player,
+    player: Phaser.Physics.Arcade.Sprite,
     controls: Phaser.Types.Input.Keyboard.CursorKeys,
     scene: Phaser.Scene
 ) => {
@@ -42,24 +42,24 @@ export const configControls = (
     player.anims.play(`cultist-idle-${lastDirection}`, true);
 }
 
-const moveRight = (player): void => {
+const moveRight = (player: Phaser.Physics.Arcade.Sprite): void => {
     player.setData('direction', 'right');
     player.anims.play('cultist-walk-right', true);
     player.setVelocityX(defaultVelocity)
 }
-const moveLeft = (player): void => {
+const moveLeft = (player: Phaser.Physics.Arcade.Sprite): void => {
     player.setData('direction', 'left');
     player.anims.play('cultist-walk-left', true);
     player.setVelocityX(-defaultVelocity)
 } 
 
-const moveUp = (player) => {
+const moveUp = (player: Phaser.Physics.Arcade.Sprite) => {
     player.setData('direction', 'up');
     player.anims.play('cultist-walk-up', true);
     player.setVelocityY(-defaultVelocity);
 }
 
-const moveDown = (player) => {
+const moveDown = (player: Phaser.Physics.Arcade.Sprite) => {
     player.setData('direction', 'down');
     player.anims.play('cultist-walk-down', true);
     player.setVelocityY(defaultVelocity);
