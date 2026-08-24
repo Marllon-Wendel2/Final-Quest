@@ -12,6 +12,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'MedievalSharp';
+  src: url('https://fonts.gstatic.com/s/medievalsharp/v28/EvOJzAlL3oU5AQl2mP5KdgptAq96MwvX.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --gold: #c9a84c;
   --gold-bright: #e8c878;
