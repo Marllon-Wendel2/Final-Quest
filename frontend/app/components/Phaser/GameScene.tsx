@@ -8,6 +8,7 @@ import { Door } from '../animations/Phaser/doors/door';
 import UIScene from './ui/UIScene';
 import { createGhost } from '../animations/Phaser/animes/ghost';
 import { eventBus } from './core/EventBus';
+import InventoryScene from './invetory/InventoryScene';
 
 export default class GameScene extends Phaser.Scene {
     private player!: Phaser.Physics.Arcade.Sprite;
@@ -79,8 +80,15 @@ export default class GameScene extends Phaser.Scene {
     update() {
       // Controle de movimento (travado enquanto dialogo ou ghost ativo)
       const ui = this.scene.get('UIScene') as UIScene;
-      if (!ui.getIsPlaying()) {
+      const inventory = this.scene.get('InventoryScene') as InventoryScene;
+
+      const dialoguePlaying = ui.getIsPlaying();
+      const inventoryOpen = inventory.isInventoryOpen();
+
+      if (!dialoguePlaying && !inventoryOpen) {
         configControls(this.player, this.controls, this);
+      } else {
+        this.player.setVelocity(0, 0);
       }
       // Atualizar interacoes
       this.interactionManager.update(this.player, this.doors, this.ghost);

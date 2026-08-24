@@ -5,7 +5,7 @@ import { loadBuildingImages } from '../animations/Phaser/buildings/buildings';
 import { loadGhostSprite } from '../animations/Phaser/animes/ghost';
 import { loadBridges } from '../animations/Phaser/bridges/bridges';
 import { loadTilemap } from '../animations/Phaser/map/tilemap';
-import { loadUI } from '../animations/Phaser/ui/ui';
+import { loadUI, loadInventory } from '../animations/Phaser/ui/ui';
 import { loadAudio } from '../animations/Phaser/audio/audio';
 
 export default class PreloadScene extends Phaser.Scene {
@@ -22,10 +22,12 @@ export default class PreloadScene extends Phaser.Scene {
     loadGhostSprite(this);
     loadSprites(this);
     loadBridges(this);
+    loadInventory(this);
   }
 
   create() {
-    this.scene.launch('UIScene'); 
+    this.scene.launch('UIScene');
+    this.scene.launch('InventoryScene');
     this.scene.start('GameScene');
   }
 }
