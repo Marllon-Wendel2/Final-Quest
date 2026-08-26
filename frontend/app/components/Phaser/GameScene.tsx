@@ -7,8 +7,10 @@ import { InteractionManager } from './core/InteractionManager';
 import { Door } from '../animations/Phaser/doors/door';
 import UIScene from './ui/UIScene';
 import { createGhost } from '../animations/Phaser/animes/ghost';
+import { createAdventurer } from '../animations/Phaser/animes/adventurer';
 import { eventBus } from './core/EventBus';
 import InventoryScene from './invetory/InventoryScene';
+
 
 export default class GameScene extends Phaser.Scene {
     private player!: Phaser.Physics.Arcade.Sprite;
@@ -18,6 +20,7 @@ export default class GameScene extends Phaser.Scene {
     private interactionManager!: InteractionManager;
     private doors: Door[] = [];
     private ghost!: ReturnType<typeof createGhost>;
+    private adventurerMale!: ReturnType<typeof createAdventurer>; 
 
     constructor() {
       super('GameScene');
@@ -43,6 +46,10 @@ export default class GameScene extends Phaser.Scene {
           if (obj.name === 'Fantasma' && obj.x !== undefined && obj.y !== undefined) {
             this.ghost = this.entityManager.createGhost(obj.x, obj.y);
           }
+
+          if (obj.name === 'aventureiro') {
+              this.adventurerMale = this.entityManager.createAventurer(obj.x, obj.y);
+          }
         });
       }
       // 4. Configurar colisoes
@@ -55,6 +62,7 @@ export default class GameScene extends Phaser.Scene {
       // 5. Configurar interacoes
       this.interactionManager = new InteractionManager(this);
       this.interactionManager.setupDoorInteraction(this.doors, this.player);
+
       if (this.ghost) {
         this.interactionManager.setupGhostProximity(this.ghost);
         this.physics.add.collider(this.player, this.ghost.collider);
@@ -62,6 +70,14 @@ export default class GameScene extends Phaser.Scene {
           this.interactionManager.onGhostCollide(this.ghost);
         });
       }
+
+      if (this.adventurerMale) {
+        this.physics.add.collider(this.player, this.adventurerMale.collider);
+        this.physics.add.overlap(this.player, this.adventurerMale.overlap, () => {
+          this.interactionManager.onAdventurerCollide(this.adventurerMale);
+        });
+      }
+
       // 6. Configurar input
       this.controls = createControls(this);
 
@@ -74,8 +90,8 @@ export default class GameScene extends Phaser.Scene {
       this.time.delayedCall(100, () => {
         const ui = this.scene.get('UIScene') as UIScene;
         ui.playScript([
-          { type: 'text', text: 'Bem-vindo, Ocultista!' },
-          { type: 'text', text: 'Va para o culto na proxima cidade!' },
+          { type: 'text', text: 'Bem-vindo, Ocultista!', speaker: 'Narrador (não confie muito)' },
+          { type: 'text', text: 'Va para o culto na proxima cidade!', speaker: 'Narrador (não confie muito)' },
         ]);
       });
     }

@@ -27,7 +27,6 @@ export default function GamePage() {
       alignItems: 'center',
       minHeight: '40vh',
       background: '#0d1a0d',
-      zoom: 1.8,
     }}>
       <PhaserGame />
     </main>

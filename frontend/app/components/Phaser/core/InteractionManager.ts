@@ -3,6 +3,8 @@ import { eventBus } from './EventBus';
 import UIScene from '../ui/UIScene';
 import { Door } from '../../animations/Phaser/doors/door';
 import { createGhost } from '../../animations/Phaser/animes/ghost';
+import { createAdventurer } from '../../animations/Phaser/animes/adventurer';
+
 export class InteractionManager {
         
     private scene: Phaser.Scene;
@@ -11,9 +13,11 @@ export class InteractionManager {
     private interactKey: Phaser.Input.Keyboard.Key | null = null;
     private ghostColliding = false;
 
+    private activeAdventurer: ReturnType<typeof createAdventurer> | null = null;
+    private adventurerColliding = false;
+
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
-        // Configura tecla de interacao
         if (scene.input.keyboard) {
         this.interactKey = scene.input.keyboard.addKey('A');
         }
@@ -52,7 +56,8 @@ export class InteractionManager {
 
         eventBus.on('ghost:talk', () => {
             const ui = this.scene.scene.get('UIScene') as UIScene;
-            ui.playScript([{type: 'text', text: 'Sozinho você não pode passar!'}])
+            ui.playScript([{type: 'text', text: 'Sozinho você não pode passar!', speaker: 'Fantasma',
+                speakerColor: 'font_gold'}])
         });
     }
 
@@ -68,10 +73,44 @@ export class InteractionManager {
         }
     }
 
+    setupAdventurerInteraction(): void {}
+
+    onAdventurerCollide(adventurer: ReturnType<typeof createAdventurer>): void {
+        this.adventurerColliding = true;
+        if (!this.activeAdventurer) {
+            this.activeAdventurer = adventurer;
+        }
+    }
+
+    private startAdventurerDialogue(): void {
+        const ui = this.scene.scene.get('UIScene') as UIScene;
+
+        ui.playScript([
+            {
+                type: 'text',
+                text: 'Olá, viajante! Não esperava encontrar ninguém por aqui.',
+                speaker: 'Aventureiro',
+                speakerColor: 'font_gold',
+            },
+            {
+                type: 'text',
+                text: 'Estou procurando minerais aqui na região.',
+                speaker: 'Aventureiro',
+                speakerColor: 'font_gold',
+            },
+            {
+                type: 'text',
+                text: 'Você está precisando de ajuda? Consiga ouro para mim e irei com você até o fim!',
+                speaker: 'Aventureiro',
+                speakerColor: 'font_gold',
+            }
+        ]);
+    }
+
     /**
      * Atualiza a cada frame (chamado pelo GameScene)
      */
-    update(player: Phaser.Physics.Arcade.Sprite, doors: Door[], ghost?: ReturnType<typeof createGhost>): void {
+    update(player: Phaser.Physics.Arcade.Sprite, doors: Door[], _ghost?: ReturnType<typeof createGhost>): void {
         // Verifica interacao com porta (tecla A)
         if (this.activeDoor && this.interactKey && Phaser.Input.Keyboard.JustDown(this.interactKey)) {
             eventBus.emit('door:interact', { door: this.activeDoor });
@@ -96,6 +135,20 @@ export class InteractionManager {
             eventBus.emit('ghost:leave');
         }
         this.ghostColliding = false;
+
+        if (this.activeAdventurer && !this.adventurerColliding) {
+            this.activeAdventurer = null;
+        }
+        this.adventurerColliding = false;
+
+        // Se está perto E pressionou A → inicia diálogo
+        if (
+            this.activeAdventurer &&
+            this.interactKey &&
+            Phaser.Input.Keyboard.JustDown(this.interactKey)
+        ) {
+            this.startAdventurerDialogue();
+        }
     }
 
 

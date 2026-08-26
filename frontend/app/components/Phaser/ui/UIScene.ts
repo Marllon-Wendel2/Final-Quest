@@ -72,7 +72,12 @@ export default class UIScene extends Phaser.Scene {
       case 'text':
         this.isWaitingForInput = false;
         this.pressZText.setAlpha(0);
-        this.dialogueBox.show(step.text, step.color);
+        this.dialogueBox.show(
+          step.text,
+          step.color,
+          step.speaker,
+          step.speakerColor
+        );
         break;
 
       case 'event':

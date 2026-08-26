@@ -8210,10 +8210,10 @@
   <object id="22" name="Fantasma" x="440" y="400">
    <point/>
   </object>
-  <object id="28" name="pesquisadora" x="272" y="112">
+  <object id="28" name="aventureiro" x="272" y="112">
    <point/>
   </object>
-  <object id="29" name="velho" x="48" y="144">
+  <object id="29" name="aventureira" x="48" y="144">
    <point/>
   </object>
  </objectgroup>
