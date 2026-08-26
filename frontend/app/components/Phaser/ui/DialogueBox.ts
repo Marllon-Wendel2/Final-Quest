@@ -20,7 +20,7 @@ export class DialogueBox extends Phaser.GameObjects.Container {
             fontFamily: FONT_FAMILY,
             fontSize: '14px',
             color: COLOR_HEX['font_white'],
-            wordWrap: { width: 540 },
+            wordWrap: { width: 300 },
             lineSpacing: 6,
         });
 
