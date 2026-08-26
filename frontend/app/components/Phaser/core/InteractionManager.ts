@@ -4,6 +4,7 @@ import UIScene from '../ui/UIScene';
 import { Door } from '../../animations/Phaser/doors/door';
 import { createGhost } from '../../animations/Phaser/animes/ghost';
 import { createAdventurer } from '../../animations/Phaser/animes/adventurer';
+import { DialogueStep } from '../ui/dialogue-types';
 
 export class InteractionManager {
         
@@ -12,6 +13,7 @@ export class InteractionManager {
     private activeGhost: ReturnType<typeof createGhost> | null = null;
     private interactKey: Phaser.Input.Keyboard.Key | null = null;
     private ghostColliding = false;
+    private hasSeenGhost =  false;
 
     private activeAdventurer: ReturnType<typeof createAdventurer> | null = null;
     private adventurerColliding = false;
@@ -67,6 +69,7 @@ export class InteractionManager {
     onGhostCollide(ghost: ReturnType<typeof createGhost>): void {
         this.ghostColliding = true;
         if (!this.activeGhost) {
+            this.hasSeenGhost = true;
             this.activeGhost = ghost;
             eventBus.emit('ghost:enter');
             eventBus.emit('ghost:talk');
@@ -85,8 +88,8 @@ export class InteractionManager {
     private startAdventurerDialogue(): void {
         const ui = this.scene.scene.get('UIScene') as UIScene;
 
-        ui.playScript([
-            {
+        const steps: DialogueStep[] = [
+                        {
                 type: 'text',
                 text: 'Olá, viajante! Não esperava encontrar ninguém por aqui.',
                 speaker: 'Aventureiro',
@@ -98,13 +101,18 @@ export class InteractionManager {
                 speaker: 'Aventureiro',
                 speakerColor: 'font_gold',
             },
-            {
+        ];
+
+        if(this.hasSeenGhost) {
+            steps.push({
                 type: 'text',
                 text: 'Você está precisando de ajuda? Consiga ouro para mim e irei com você até o fim!',
                 speaker: 'Aventureiro',
                 speakerColor: 'font_gold',
-            }
-        ]);
+            });
+        }
+
+        ui.playScript(steps);
     }
 
     /**
