@@ -47,7 +47,7 @@ export default class GameScene extends Phaser.Scene {
             this.ghost = this.entityManager.createGhost(obj.x, obj.y);
           }
 
-          if (obj.name === 'aventureiro') {
+          if (obj.name === 'aventureiro' && obj.x !== undefined && obj.y !== undefined) {
               this.adventurerMale = this.entityManager.createAventurer(obj.x, obj.y);
           }
         });
