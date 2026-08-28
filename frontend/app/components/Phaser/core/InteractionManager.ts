@@ -5,6 +5,7 @@ import { Door } from '../../animations/Phaser/doors/door';
 import { createGhost } from '../../animations/Phaser/animes/ghost';
 import { createAdventurer } from '../../animations/Phaser/animes/adventurer';
 import { DialogueStep } from '../ui/dialogue-types';
+import { countItems, getGameState, sendGameAction } from '@/api/game-api';
 
 export class InteractionManager {
         
@@ -58,8 +59,12 @@ export class InteractionManager {
 
         eventBus.on('ghost:talk', () => {
             const ui = this.scene.scene.get('UIScene') as UIScene;
-            ui.playScript([{type: 'text', text: 'Sozinho você não pode passar!', speaker: 'Fantasma',
-                speakerColor: 'font_gold'}])
+            ui.playScript([{
+                type: 'text', 
+                text: 'Sozinho você não pode passar!',
+                speaker: 'Fantasma',
+                speakerColor: 'font_gold'
+            }])
         });
     }
 
@@ -73,6 +78,10 @@ export class InteractionManager {
             this.activeGhost = ghost;
             eventBus.emit('ghost:enter');
             eventBus.emit('ghost:talk');
+
+            sendGameAction('GHOST_ENCOUNTERED', {}).catch((err) => {
+                console.warn('[InteractionManager] Failed to send GHOST_ENCOUNTERED:', err)
+            });
         }
     }
 
@@ -85,32 +94,70 @@ export class InteractionManager {
         }
     }
 
-    private startAdventurerDialogue(): void {
+    private async startAdventurerDialogue(): Promise<void> {
         const ui = this.scene.scene.get('UIScene') as UIScene;
+        const gameState = await getGameState();
 
+        const flags = gameState?.flags || {};
+        const inventory = gameState?.inventory || [];
+        const missions = gameState?.missions || [];
+
+        const backendHasSeenGhost = flags.hasSeenGhost || this.hasSeenGhost;
+        const pedrasCount = countItems(inventory, 'pedra_ouro');
+        const hasDeliveryMission = missions.some(
+            (m) => m.type === 'DELIVERY' && m.target === 'aventureiro' && !m.completed
+        );
+
+        // Helper local para evitar repetição de objeto
+        const speak = (text: string): DialogueStep => ({
+            type: 'text',
+            text,
+            speaker: 'Aventureiro',
+            speakerColor: 'font_gold',
+        });
+
+        // CASO 1: Não viu o fantasma (Diálogo Inicial)
+        if (!backendHasSeenGhost) {
+            await sendGameAction('ADVENTURER_TALKED', {});
+            return ui.playScript([
+            speak('Olá, viajante! Não esperava encontrar ninguém por aqui.'),
+            speak('Estou procurando minerais aqui na região.'),
+            ]);
+        }
+
+        // CASO 2: Viu o fantasma (Diálogo Principal)
         const steps: DialogueStep[] = [
-                        {
-                type: 'text',
-                text: 'Olá, viajante! Não esperava encontrar ninguém por aqui.',
-                speaker: 'Aventureiro',
-                speakerColor: 'font_gold',
-            },
-            {
-                type: 'text',
-                text: 'Estou procurando minerais aqui na região.',
-                speaker: 'Aventureiro',
-                speakerColor: 'font_gold',
-            },
+            speak('Ah, você de novo! Precisa de ajuda?'),
         ];
 
-        if(this.hasSeenGhost) {
-            steps.push({
-                type: 'text',
-                text: 'Você está precisando de ajuda? Consiga ouro para mim e irei com você até o fim!',
-                speaker: 'Aventureiro',
-                speakerColor: 'font_gold',
-            });
+        // SUB-CASO 2A: Tem pedras suficientes -> Entrega
+        if (pedrasCount >= 3) {
+            steps.push(speak(`Vejo que você tem ${pedrasCount} pedras de ouro! Perfeito, entrega para mim!`));
+            
+            const result = await sendGameAction('DELIVERY_REQUEST', { targetNpc: 'aventureiro' });
+            const responseText = result.accepted
+            ? 'Excelente! Agora posso seguir minha jornada. Obrigado!'
+            : 'Algo deu errado... Tente novamente.';
+
+            steps.push(speak(responseText));
+            return ui.playScript(steps);
         }
+
+        // SUB-CASO 2B: Já tem a missão -> Lembrete
+        if (hasDeliveryMission) {
+            steps.push(speak(`Você ainda precisa de ${3 - pedrasCount} pedras de ouro. Volte quando tiver 3.`));
+            return ui.playScript(steps);
+        }
+
+        // SUB-CASO 2C: Não tem a missão -> Inicia Missão
+        steps.push(speak('Se você quer que eu vá com você, traga 3 pedras de ouro!'));
+        await sendGameAction('MISSION_STARTED', {
+            missionId: 'mission-adventurer-delivery',
+            missionType: 'DELIVERY',
+            label: 'Contratando o aventureiro',
+            target: 'aventureiro',
+            required: 3,
+        });
 
         ui.playScript(steps);
     }
@@ -118,26 +165,37 @@ export class InteractionManager {
     /**
      * Atualiza a cada frame (chamado pelo GameScene)
      */
-    update(player: Phaser.Physics.Arcade.Sprite, doors: Door[], _ghost?: ReturnType<typeof createGhost>): void {
-        // Verifica interacao com porta (tecla A)
-        if (this.activeDoor && this.interactKey && Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+    update(
+        player: Phaser.Physics.Arcade.Sprite,
+        doors: Door[],
+        _ghost?: ReturnType<typeof createGhost>
+    ): void {
+        const isInteractPressed = Boolean(
+            this.interactKey && Phaser.Input.Keyboard.JustDown(this.interactKey)
+        );
+
+        // 1. Processar interações de tecla (Input)
+        if (isInteractPressed) {
+            if (this.activeDoor) {
             eventBus.emit('door:interact', { door: this.activeDoor });
+            } else if (this.activeAdventurer) {
+            this.startAdventurerDialogue();
+            }
         }
 
-        // Verifica saida da zona da porta
-        const isOverlappingDoor = doors.some((door) => {
-        const bounds = door.zone.getBounds();
-        return Phaser.Geom.Intersects.RectangleToRectangle(
+        // 2. Limpar portas fora de alcance
+        const isOverlappingDoor = doors.some((door) =>
+            Phaser.Geom.Intersects.RectangleToRectangle(
             player.getBounds(),
-            bounds
+            door.zone.getBounds()
+            )
         );
-        });
 
         if (!isOverlappingDoor) {
-        this.activeDoor = null;
+            this.activeDoor = null;
         }
 
-        // Saida do ghost: se nao colidiu neste frame, jogador saiu da zona
+        // 3. Resetar estados de colisão (Ghost e Adventurer)
         if (this.activeGhost && !this.ghostColliding) {
             this.activeGhost = null;
             eventBus.emit('ghost:leave');
@@ -148,16 +206,7 @@ export class InteractionManager {
             this.activeAdventurer = null;
         }
         this.adventurerColliding = false;
-
-        // Se está perto E pressionou A → inicia diálogo
-        if (
-            this.activeAdventurer &&
-            this.interactKey &&
-            Phaser.Input.Keyboard.JustDown(this.interactKey)
-        ) {
-            this.startAdventurerDialogue();
         }
-    }
 
 
     /**

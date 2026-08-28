@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { InventorySlot } from './InventorySlot';
 import { eventBus } from '../core/EventBus';
 import { FONT_FAMILY, COLOR_HEX } from '../ui/FontManager';
+import { getGameState } from '@/api/game-api';
 
 export interface InventoryPanelConfig {
     x: number;
@@ -189,4 +190,13 @@ export class InventoryPanel extends Phaser.GameObjects.Container {
     isInventoryOpen(): boolean {
         return this.isOpen;
     }
+
+    syncInventoryWithBackend = async (): Promise<void> => {
+        const gameState = await getGameState();
+        if (!gameState) return;
+
+        gameState.inventory.forEach((item) => {
+            this.slots[item.slotIndex]?.setItem(item.itemKey);
+        });
+    };
 }

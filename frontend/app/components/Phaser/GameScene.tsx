@@ -10,6 +10,7 @@ import { createGhost } from '../animations/Phaser/animes/ghost';
 import { createAdventurer } from '../animations/Phaser/animes/adventurer';
 import { eventBus } from './core/EventBus';
 import InventoryScene from './invetory/InventoryScene';
+import { getGameState, sendGameAction } from '@/api/game-api';
 
 
 export default class GameScene extends Phaser.Scene {
@@ -20,20 +21,29 @@ export default class GameScene extends Phaser.Scene {
     private interactionManager!: InteractionManager;
     private doors: Door[] = [];
     private ghost!: ReturnType<typeof createGhost>;
-    private adventurerMale!: ReturnType<typeof createAdventurer>; 
+    private adventurerMale!: ReturnType<typeof createAdventurer>;
+    private lastSavedPos = { x: 0, y: 0 };
+    private saveDebounce = 0;
 
     constructor() {
       super('GameScene');
     }
 
-    create() {
+    async create() {
       this.cameras.main.setViewport(0, 0, 720, 620);
       // 1. Setup do mapa
       this.mapManager = new MapManager(this);
       const { map, grassLayer, waterLayer, roadsLayer, treesLayer } = this.mapManager.create();
       // 2. Criacao de entidades
       this.entityManager = new EntityManager(this);
-      this.player = this.entityManager.createPlayer(150, 360, 'right');
+
+      // Carregar posição salva do backend
+      const savedState = await getGameState();
+      const startX = savedState?.player?.x ?? 150;
+      const startY = savedState?.player?.y ?? 360;
+      const startDir = savedState?.player?.direction ?? 'right';
+
+      this.player = this.entityManager.createPlayer(startX, startY, startDir);
       const buildings = this.entityManager.createBuildings(map);
       this.entityManager.createLamb(60.67, 198);
       this.doors = this.entityManager.createDoors(map);
@@ -86,17 +96,21 @@ export default class GameScene extends Phaser.Scene {
         this.player.anims.stop();
       });
 
-      // 7. UI
-      this.time.delayedCall(100, () => {
-        const ui = this.scene.get('UIScene') as UIScene;
-        ui.playScript([
-          { type: 'text', text: 'Bem-vindo, Ocultista!', speaker: 'Narrador (não confie muito)' },
-          { type: 'text', text: 'Va para o culto na proxima cidade!', speaker: 'Narrador (não confie muito)' },
-        ]);
-      });
+      // 7. UI - mensagem de boas-vindas apenas para novos jogadores
+      if (!savedState) {
+        this.time.delayedCall(100, () => {
+          const ui = this.scene.get('UIScene') as UIScene;
+          ui.playScript([
+            { type: 'text', text: 'Bem-vindo, Ocultista!', speaker: 'Narrador (não confie muito)' },
+            { type: 'text', text: 'Va para o culto na proxima cidade!', speaker: 'Narrador (não confie muito)' },
+          ]);
+        });
+      }
     }
 
-    update() {
+    update(time: number) {
+      if (!this.player) return;
+
       // Controle de movimento (travado enquanto dialogo ou ghost ativo)
       const ui = this.scene.get('UIScene') as UIScene;
       const inventory = this.scene.get('InventoryScene') as InventoryScene;
@@ -111,5 +125,18 @@ export default class GameScene extends Phaser.Scene {
       }
       // Atualizar interacoes
       this.interactionManager.update(this.player, this.doors, this.ghost);
+
+      // Salvar posição periodicamente (a cada 2s se houve movimento)
+      const px = Math.round(this.player.x);
+      const py = Math.round(this.player.y);
+      if (
+        time > this.saveDebounce &&
+        (px !== this.lastSavedPos.x || py !== this.lastSavedPos.y)
+      ) {
+        this.saveDebounce = time + 2000;
+        this.lastSavedPos = { x: px, y: py };
+        const dir = this.player.getData('direction') || 'right';
+        sendGameAction('PLAYER_MOVED', { x: px, y: py, direction: dir });
+      }
     }
 }
