@@ -5,9 +5,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
-import { getResetWindow } from 'src/mission/reset-window';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { RankingGateway } from 'src/ranking/ranking.gateway';
+import { getResetWindow } from '../mission/reset-window';
+import { PrismaService } from '../prisma/prisma.service';
+import { RankingGateway } from '../ranking/ranking.gateway';
 
 @Injectable()
 export class MissionProcessorService {

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { RedisModule } from 'src/redis/redis.module';
-import { AuthModule } from 'src/auth/auth.module';
+import { RedisModule } from '../redis/redis.module';
+import { AuthModule } from '../auth/auth.module';
 import { GameService } from './game.service';
 import { BotService } from './bot.service';
 import { GameGateway } from './game.gateway';

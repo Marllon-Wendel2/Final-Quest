@@ -2,11 +2,11 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MissionProcessorService } from './mission.processor';
-import { createPrismaMock, PrismaMock } from 'src/test/prisma.mock';
-import { createRankingGatewayMock } from 'src/test/ranking-gateway.mock';
-import { makeMission, makePlayerMission } from 'src/test/fixtures';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { RankingGateway } from 'src/ranking/ranking.gateway';
+import { createPrismaMock, PrismaMock } from '../test/prisma.mock';
+import { createRankingGatewayMock } from '../test/ranking-gateway.mock';
+import { makeMission, makePlayerMission } from '../test/fixtures';
+import { PrismaService } from '../prisma/prisma.service';
+import { RankingGateway } from '../ranking/ranking.gateway';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 
 describe('MissionProcessorService', () => {

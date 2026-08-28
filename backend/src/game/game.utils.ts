@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { RedisService } from 'src/redis/redis.service';
+import { RedisService } from '../redis/redis.service';
 import { BaseGame } from './game.types';
 
 export function validateOwnership(game: BaseGame, userId: string): void {

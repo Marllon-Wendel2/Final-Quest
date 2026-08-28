@@ -1,4 +1,4 @@
-import { ZodValidationPipe } from 'src/common/zod-validation-pipe';
+import { ZodValidationPipe } from '../../common/zod-validation-pipe';
 import z from 'zod';
 
 const FrequencyEnum = z.enum(['MINUTE', 'HOUR', 'DAILY', 'WEEKLY', 'ONCE']);

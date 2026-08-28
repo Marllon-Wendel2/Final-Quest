@@ -21,7 +21,7 @@ import {
   type CreateMissionDto,
   UpdateMissionPipe,
 } from './dto/mission.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Missions')
 @ApiCookieAuth('token')

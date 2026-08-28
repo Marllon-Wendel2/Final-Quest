@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
-import { PrismaModule } from 'src/prisma/prisma.module';
-import { RankingModule } from 'src/ranking/ranking.module';
+import { PrismaModule } from '../prisma/prisma.module';
+import { RankingModule } from '../ranking/ranking.module';
 import { MISSION_QUEUE, QUEUE_CONFIG } from './queue.constantes';
 import { QueueMonitorController } from './queue.monitor.controller';
 import { MissionQueue } from './mission.queue';
