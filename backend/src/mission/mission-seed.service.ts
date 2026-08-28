@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class MissionSeedService implements OnModuleInit {
@@ -76,6 +76,23 @@ export class MissionSeedService implements OnModuleInit {
           frequency: 'ONCE',
           maxCompletions: 3,
           challengeType: 'TIC_TAC_TOE',
+        },
+        {
+          title: 'Contratando o aventureiro',
+          description:
+            'Entregue 3 pedras de ouro ao aventureiro para que ele possa continuar sua jornada',
+          points: 100,
+          frequency: 'ONCE',
+          challengeType: 'NONE',
+          missionType: 'DELIVERY',
+          requirements: {
+            itemKey: 'pedra_ouro',
+            quantity: 3,
+            targetNpc: 'aventureiro',
+          },
+          prerequisites: {
+            flag: 'hasSeenGhost',
+          },
         },
       ],
     });

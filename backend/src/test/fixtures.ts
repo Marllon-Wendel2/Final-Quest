@@ -24,6 +24,9 @@ export function makeMission(overrides?: Partial<Mission>): Mission {
     frequency: 'ONCE',
     maxCompletions: 1,
     challengeType: 'NONE',
+    missionType: 'COLLECTION',
+    requirements: {},
+    prerequisites: {},
     ...overrides,
   };
 }
@@ -37,6 +40,8 @@ export function makePlayerMission(
     missionId: 'mission-id-001',
     completedAt: new Date('2026-01-01'),
     resetWindow: 'once',
+    status: 'active',
+    progress: 0,
     ...overrides,
   };
 }

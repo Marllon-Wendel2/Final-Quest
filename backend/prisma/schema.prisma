@@ -6,6 +6,90 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id           String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String          @unique
+  name         String
+  hashPassword String          @map("hash_password")
+  points       Int             @default(0)
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  role         Role            @default(USER)
+  gameEvents   GameEvent[]
+  gameSave     GameSave?
+  missions     PlayerMission[]
+  save         Save?
+
+  @@map("users")
+}
+
+model Mission {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title          String
+  description    String
+  points         Int
+  createdAt      DateTime        @default(now()) @map("created_at")
+  frequency      Frequency       @default(ONCE)
+  maxCompletions Int             @default(1) @map("max_completions")
+  challengeType  ChallengeType   @default(NONE) @map("challenge_type")
+  missionType    MissionType     @default(COLLECTION) @map("mission_type")
+  requirements   Json            @default("{}") @map("requirements")
+  prerequisites  Json?           @default("{}") @map("prerequisites")
+  players        PlayerMission[]
+
+  @@map("missions")
+}
+
+model PlayerMission {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  missionId   String   @map("mission_id") @db.Uuid
+  completedAt DateTime @default(now()) @map("completed_at")
+  resetWindow String   @map("reset_window")
+  progress    Int      @default(0)
+  status      String   @default("active")
+  mission     Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, missionId, resetWindow])
+  @@map("player_missions")
+}
+
+model Save {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @unique @map("user_id") @db.Uuid
+  version   Int      @default(1)
+  state     Json
+  lastSaved DateTime @default(now()) @map("last_saved")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("saves")
+}
+
+model GameSave {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @unique @map("user_id") @db.Uuid
+  state     Json
+  version   Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("game_saves")
+}
+
+model GameEvent {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  eventType EventType @map("event_type")
+  payload   Json
+  version   Int
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, version])
+  @@map("game_events")
+}
+
 enum Role {
   USER
   ADMIN
@@ -26,44 +110,23 @@ enum ChallengeType {
   TIC_TAC_TOE
 }
 
-model User {
-  id           String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email        String          @unique
-  name         String
-  hashPassword String          @map("hash_password")
-  role         Role            @default(USER)
-  points       Int             @default(0)
-  createdAt    DateTime        @default(now()) @map("created_at")
-  updatedAt    DateTime        @updatedAt @map("updated_at")
-  missions     PlayerMission[]
-
-  @@map("users")
+enum EventType {
+  PLAYER_MOVED
+  ITEM_COLLECTED
+  ITEM_USED
+  DIALOGUE_COMPLETED
+  GHOST_ENCOUNTERED
+  ADVENTURER_TALKED
+  MISSION_STARTED
+  MISSION_PROGRESS
+  MISSION_COMPLETED
+  FLAG_SET
+  MINIGAME_RESULT
 }
 
-model Mission {
-  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title          String
-  description    String
-  points         Int
-  createdAt      DateTime        @default(now()) @map("created_at")
-  frequency      Frequency       @default(ONCE)
-  maxCompletions Int             @default(1) @map("max_completions")
-  players        PlayerMission[]
-  challengeType  ChallengeType   @default(NONE) @map("challenge_type")
-
-  @@map("missions")
-}
-
-model PlayerMission {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId      String   @map("user_id") @db.Uuid
-  missionId   String   @map("mission_id") @db.Uuid
-  completedAt DateTime @default(now()) @map("completed_at")
-  resetWindow String   @map("reset_window")
-
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, missionId, resetWindow])
-  @@map("player_missions")
+enum MissionType {
+  COLLECTION
+  BATTLE
+  DIALOGUE
+  DELIVERY
 }
