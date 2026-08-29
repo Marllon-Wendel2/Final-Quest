@@ -2,7 +2,7 @@
 import { NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { MissionWorker } from './mission.worker';
-import { makePlayerMission } from 'src/test/fixtures';
+import { makePlayerMission } from '../test/fixtures';
 
 describe('MissionWorker', () => {
   let worker: MissionWorker;

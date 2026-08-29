@@ -11,6 +11,7 @@ import { RankingModule } from './ranking/ranking.module';
 import { QueueModule } from './queue/queue.module';
 import { RedisModule } from './redis/redis.module';
 import { GameModule } from './game/game.module';
+import { GameSaveModule } from './game-save/game-save.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { GameModule } from './game/game.module';
     QueueModule,
     RedisModule.forRoot(),
     GameModule,
+    GameSaveModule,
   ],
   controllers: [AppController],
   providers: [AppService],

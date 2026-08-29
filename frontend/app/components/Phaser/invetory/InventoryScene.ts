@@ -29,6 +29,8 @@ export default class InventoryScene extends Phaser.Scene {
         eventBus.on('inventory:toggle', this.onToggleEvent);
         eventBus.on('inventory:close', this.onCloseEvent);
 
+        this.syncInventoryWithBackend();
+
         this.events.on('destroy', () => {
             eventBus.off('inventory:toggle', this.onToggleEvent);
             eventBus.off('inventory:close', this.onCloseEvent);
@@ -64,5 +66,9 @@ export default class InventoryScene extends Phaser.Scene {
      */
     isInventoryOpen(): boolean {
         return this.inventoryPanel?.isInventoryOpen() ?? false;
+    }
+
+    syncInventoryWithBackend(): void {
+        this.inventoryPanel?.syncInventoryWithBackend();
     }
 }

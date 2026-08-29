@@ -8,6 +8,7 @@ import { loadTilemap } from '../animations/Phaser/map/tilemap';
 import { loadUI, loadInventory } from '../animations/Phaser/ui/ui';
 import { loadGoldSprite } from '../animations/Phaser/minerals/gold';
 import { loadAudio } from '../animations/Phaser/audio/audio';
+import { loadAdventurerSprite } from '../animations/Phaser/animes/adventurer';
 
 export default class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -21,6 +22,7 @@ export default class PreloadScene extends Phaser.Scene {
     loadBuildingImages(this);
     loadLambSprite(this);
     loadGhostSprite(this);
+    loadAdventurerSprite(this);
     loadSprites(this);
     loadBridges(this);
     loadInventory(this);

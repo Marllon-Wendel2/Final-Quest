@@ -3,10 +3,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { getResetWindow } from 'src/mission/reset-window';
-import { MissionQueue } from 'src/queue/mission.queue';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { RankingGateway } from 'src/ranking/ranking.gateway';
+import { getResetWindow } from '../mission/reset-window';
+import { MissionQueue } from '../queue/mission.queue';
+import { PrismaService } from '../prisma/prisma.service';
+import { RankingGateway } from '../ranking/ranking.gateway';
 
 @Injectable()
 export class PlayerMissionService {

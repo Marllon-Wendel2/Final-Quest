@@ -6,24 +6,16 @@ import AuthForm from './components/AuthForm';
 import MissionsList from './components/MissionsList';
 import RankingList from './components/RankingList';
 import ServerWakeUpBanner from './components/ServerWakeUpBanner';
-import { logout } from '../api/auth';
-import { getMe, User } from '../api/client';
+import { useAuth } from './contexts/AuthContext';
+import { getMe } from '../api/client';
 import './globals.css';
 
 export default function Home() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, setUser, loading, logout: authLogout } = useAuth();
   const [pointsAnimating, setPointsAnimating] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const prevPointsRef = useRef<number | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-
-  useEffect(() => {
-    getMe().then((userData) => {
-      setUser(userData);
-      setLoading(false);
-    });
-  }, []);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -63,8 +55,7 @@ export default function Home() {
   };
 
   const handleLogout = async () => {
-    await logout();
-    setUser(null);
+    await authLogout();
   };
 
   if (loading) {

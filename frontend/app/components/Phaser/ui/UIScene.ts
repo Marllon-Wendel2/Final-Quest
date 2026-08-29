@@ -21,7 +21,7 @@ export default class UIScene extends Phaser.Scene {
 
     // Caixa de diálogo fica na área do jogo (esquerda, 720px)
     const gameAreaWidth = 720;
-    const panelX = gameAreaWidth / 2;
+    const panelX = gameAreaWidth / 2 - 40;
     const panelY = 560;
 
     this.add.nineslice(
@@ -32,7 +32,7 @@ export default class UIScene extends Phaser.Scene {
       96, 115, 89, 146
     );
 
-    this.dialogueBox = new DialogueBox(this, 130, 480);
+    this.dialogueBox = new DialogueBox(this, 100, 480);
     this.add.existing(this.dialogueBox);
 
     this.pressZText = this.add.text(this.scale.width - 400, 500, 'Pressione "Z"', {
@@ -72,7 +72,12 @@ export default class UIScene extends Phaser.Scene {
       case 'text':
         this.isWaitingForInput = false;
         this.pressZText.setAlpha(0);
-        this.dialogueBox.show(step.text, step.color);
+        this.dialogueBox.show(
+          step.text,
+          step.color,
+          step.speaker,
+          step.speakerColor
+        );
         break;
 
       case 'event':
@@ -98,6 +103,7 @@ export default class UIScene extends Phaser.Scene {
       } else {
         this.dialogueBox.hide();
         this.isPlaying = false;
+        eventBus.emit('dialogue:end');
       }
     }
   }

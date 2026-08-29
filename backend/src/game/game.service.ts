@@ -4,7 +4,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { RedisService } from 'src/redis/redis.service';
+import { RedisService } from '../redis/redis.service';
 import { BotService } from './bot.service';
 import { GameState, Board, GAME_TTL_SECONDS } from './game.types';
 import {

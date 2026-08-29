@@ -5,7 +5,9 @@ export class DialogueBox extends Phaser.GameObjects.Container {
     static readonly PADDING = 20;
 
     private textObject: Phaser.GameObjects.Text;
+    private speakerText: Phaser.GameObjects.Text;
     private currentColor: FontColor = 'font_white';
+    private currentSpeakerColor: FontColor = 'font_gold';
     private typewriterTimer?: Phaser.Time.TimerEvent;
     private typewriterResolvers: Array<() => void> = [];
     private fullText: string = '';
@@ -18,20 +20,45 @@ export class DialogueBox extends Phaser.GameObjects.Container {
             fontFamily: FONT_FAMILY,
             fontSize: '14px',
             color: COLOR_HEX['font_white'],
-            wordWrap: { width: 540 },
+            wordWrap: { width: 300 },
             lineSpacing: 6,
         });
 
-        this.add([this.textObject]);
+        this.speakerText = scene.add.text(
+            DialogueBox.PADDING + 20,
+            0,
+            '',
+            {
+                fontFamily: FONT_FAMILY,
+                fontSize: '12px',
+                color: COLOR_HEX['font_gold'],
+                fontStyle: 'bold',
+            }
+        );
+
+        this.add([this.textObject, this.speakerText]);
         this.setVisible(false);
     }
 
-    show(text: string, color: FontColor = 'font_white'): void {
+    show(
+        text: string,
+        color: FontColor = 'font_white',
+        speaker?: string,
+        speakerColor: FontColor = 'font_gold'
+    ): void {
         this.setColor(color);
         this.setVisible(true);
         this.alpha = 1;
         this.fullText = text;
         this.textObject.setText('');
+
+        if (speaker) {
+            this.speakerText.setText(speaker);
+            this.speakerText.setColor(COLOR_HEX[speakerColor || 'font_gold']);
+            this.speakerText.setVisible(true);
+        } else {
+            this.speakerText.setVisible(false);
+        }
 
         let index = 0;
         this.typewriterTimer?.destroy();
@@ -61,6 +88,7 @@ export class DialogueBox extends Phaser.GameObjects.Container {
             duration: 300,
             onComplete: () => {
                 this.setVisible(false);
+                this.speakerText.setVisible(false); 
             },
         });
     }
@@ -68,6 +96,11 @@ export class DialogueBox extends Phaser.GameObjects.Container {
     setColor(color: FontColor): void {
         this.currentColor = color;
         this.textObject.setColor(COLOR_HEX[color]);
+    }
+
+    setSpeakerColor(color: FontColor): void {
+        this.currentSpeakerColor = color;
+        this.speakerText.setColor(COLOR_HEX[color]);
     }
 
     setText(text: string): void {
