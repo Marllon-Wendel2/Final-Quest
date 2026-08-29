@@ -31,6 +31,10 @@ export async function getMe(): Promise<User | null> {
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
+    if (error.response?.status === 401 && window.location.pathname !== '/') {
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.href = '/';
+    }
     return Promise.reject(error);
   },
 );
