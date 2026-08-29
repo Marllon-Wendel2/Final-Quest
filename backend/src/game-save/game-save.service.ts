@@ -9,6 +9,7 @@ export interface GameState {
   version: number;
   userId: string;
   player: { x: number; y: number; direction: string };
+  adventurer?: { x: number; y: number; direction: string };
   inventory: Array<{ slotIndex: number; itemKey: string }>;
   flags: Record<string, boolean>;
   missions: Array<{
@@ -20,6 +21,7 @@ export interface GameState {
     required: number;
     completed: boolean;
   }>;
+  team: string[];
   lastSaved: string;
 }
 
@@ -68,6 +70,7 @@ export class GameSaveService {
       inventory: [],
       flags: {},
       missions: [],
+      team: ['ocultist'],
       lastSaved: new Date().toISOString(),
     };
   }

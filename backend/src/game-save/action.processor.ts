@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { GameSaveService, GameState } from './game-save.service';
 import { EventStoreService } from './event-store.service';
-import { EventType, Mission } from '@prisma/client';
+import { Mission } from '@prisma/client';
+import { GameActionType } from './dtos/addActionCommand.dto';
 
 @Injectable()
 export class ActionProcessor {
@@ -179,7 +180,7 @@ export class ActionProcessor {
 
   async process(
     userId: string,
-    command: { type: EventType; payload: Record<string, unknown> },
+    command: { type: GameActionType; payload: Record<string, unknown> },
   ): Promise<{ success: boolean; state: GameState }> {
     let state = await this.gameSaveService.getCanonicalState(userId);
     if (!state) state = this.gameSaveService.createDefaultState(userId);
@@ -202,7 +203,7 @@ export class ActionProcessor {
 
   private applyCommand(
     state: GameState,
-    command: { type: EventType; payload: Record<string, unknown> },
+    command: { type: GameActionType; payload: Record<string, unknown> },
   ): GameState {
     const newState = { ...state, version: state.version + 1 };
     newState.lastSaved = new Date().toISOString();
@@ -224,6 +225,19 @@ export class ActionProcessor {
           },
         ];
         break;
+      case 'ITEM_USED': {
+        const itemKey = command.payload.itemKey as string;
+        const quantity = (command.payload.quantity as number) || 1;
+        let removed = 0;
+        newState.inventory = state.inventory.filter((item) => {
+          if (item.itemKey === itemKey && removed < quantity) {
+            removed++;
+            return false;
+          }
+          return true;
+        });
+        break;
+      }
       case 'FLAG_SET':
         newState.flags = {
           ...state.flags,
@@ -263,6 +277,17 @@ export class ActionProcessor {
             ? { ...m, completed: true, current: m.required }
             : m,
         );
+        break;
+      case 'TEAM_UPDATED': {
+        newState.team = command.payload.team as string[];
+        break;
+      }
+      case 'ADVENTURER_MOVED':
+        newState.adventurer = {
+          x: command.payload.x as number,
+          y: command.payload.y as number,
+          direction: command.payload.direction as string,
+        };
         break;
     }
     return newState;

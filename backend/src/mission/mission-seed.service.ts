@@ -86,7 +86,7 @@ export class MissionSeedService implements OnModuleInit {
           challengeType: 'NONE',
           missionType: 'DELIVERY',
           requirements: {
-            itemKey: 'pedra_ouro',
+            itemKey: 'item_gold',
             quantity: 3,
             targetNpc: 'aventureiro',
           },

@@ -78,13 +78,13 @@ model GameSave {
 }
 
 model GameEvent {
-  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId    String    @map("user_id") @db.Uuid
-  eventType EventType @map("event_type")
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  eventType String   @map("event_type")
   payload   Json
   version   Int
-  createdAt DateTime  @default(now()) @map("created_at")
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, version])
   @@map("game_events")
@@ -108,20 +108,6 @@ enum ChallengeType {
   NONE
   MEMORY
   TIC_TAC_TOE
-}
-
-enum EventType {
-  PLAYER_MOVED
-  ITEM_COLLECTED
-  ITEM_USED
-  DIALOGUE_COMPLETED
-  GHOST_ENCOUNTERED
-  ADVENTURER_TALKED
-  MISSION_STARTED
-  MISSION_PROGRESS
-  MISSION_COMPLETED
-  FLAG_SET
-  MINIGAME_RESULT
 }
 
 enum MissionType {

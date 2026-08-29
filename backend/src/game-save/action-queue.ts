@@ -2,12 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { GAME_ACTION_QUEUE } from './game-save.constants';
-import { AddActionCommandDto } from './dtos/addActionCommand.dto';
-import { EventType } from '@prisma/client';
+import { AddActionCommandDto, GameActionType } from './dtos/addActionCommand.dto';
 
 export interface GameActionJobData {
   userId: string;
-  command: { type: EventType; payload: Record<string, unknown> };
+  command: { type: GameActionType; payload: Record<string, unknown> };
   requestedAt: string;
 }
 

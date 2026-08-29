@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { EventType } from '@prisma/client';
+import { GameActionType } from './dtos/addActionCommand.dto';
 
 @Injectable()
 export class EventStoreService {
@@ -8,7 +8,7 @@ export class EventStoreService {
 
   async save(
     userId: string,
-    eventType: EventType,
+    eventType: GameActionType,
     payload: Record<string, unknown>,
     version: number,
   ): Promise<void> {

@@ -25,7 +25,7 @@ export class ActionWorker extends WorkerHost {
       await job.updateProgress(100);
       return result;
     } catch (error) {
-      this.logger.error(`Ação ${job.id} falhou: ${error}`);
+      this.logger.error(`Ação ${job.id} falhou: ${error}!`);
       throw error;
     }
   }
