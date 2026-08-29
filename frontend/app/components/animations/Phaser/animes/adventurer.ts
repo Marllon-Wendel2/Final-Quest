@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 
 export const loadAdventurerSprite = (scene: Phaser.Scene) => {
+
+    //idle animations
     scene.load.spritesheet(
         'adventurer_idle_down',
         'phaser/Personagens/aventureiro/Sprites/IDLE/idle_down.png',
@@ -24,6 +26,27 @@ export const loadAdventurerSprite = (scene: Phaser.Scene) => {
         'phaser/Personagens/aventureiro/Sprites/IDLE/idle_up.png',
         { frameWidth: 64, frameHeight: 80, spacing: 128 }
     );
+
+    //idle run
+    scene.load.spritesheet('adventurer_run_down',
+        'phaser/Personagens/aventureiro/Sprites/RUN/run_down.png',
+        { frameWidth: 64, frameHeight: 80, spacing: 128 }
+    );
+
+    scene.load.spritesheet('adventurer_run_left',
+        'phaser/Personagens/aventureiro/Sprites/RUN/run_left.png',
+        { frameWidth: 64, frameHeight: 80, spacing: 128 }
+    );
+
+    scene.load.spritesheet('adventurer_run_right',
+        'phaser/Personagens/aventureiro/Sprites/RUN/run_right.png',
+        { frameWidth: 64, frameHeight: 80, spacing: 128 }
+    );
+
+    scene.load.spritesheet('adventurer_run_up',
+        'phaser/Personagens/aventureiro/Sprites/RUN/run_up.png',
+        { frameWidth: 64, frameHeight: 80, spacing: 128 }
+    );
 }
 
 const COLLIDER_WIDTH = 20;
@@ -39,10 +62,10 @@ export const createAdventurer = (scene: Phaser.Scene, x: number, y: number) => {
             key: 'adventurer-idle-down',
             frames: anims.generateFrameNumbers('adventurer_idle_down', {
                 start: 0,
-                end: 11,  // 12 frames (0 a 11)
+                end: 3,
             }),
-            frameRate: 5,   // 8 frames por segundo = animação suave
-            repeat: -1,     // -1 = repetir para sempre (loop)
+            frameRate: 5,
+            repeat: -1,
         });
     }
 
@@ -51,7 +74,7 @@ export const createAdventurer = (scene: Phaser.Scene, x: number, y: number) => {
             key: 'adventurer-idle-left',
             frames: anims.generateFrameNumbers('adventurer_idle_left', {
                 start: 0,
-                end: 11,
+                end: 3,
             }),
             frameRate: 8,
             repeat: -1,
@@ -63,7 +86,7 @@ export const createAdventurer = (scene: Phaser.Scene, x: number, y: number) => {
             key: 'adventurer-idle-right',
             frames: anims.generateFrameNumbers('adventurer_idle_right', {
                 start: 0,
-                end: 11,
+                end: 3,
             }),
             frameRate: 8,
             repeat: -1,
@@ -75,8 +98,42 @@ export const createAdventurer = (scene: Phaser.Scene, x: number, y: number) => {
             key: 'adventurer-idle-up',
             frames: anims.generateFrameNumbers('adventurer_idle_up', {
                 start: 0,
-                end: 11,
+                end: 3,
             }),
+            frameRate: 8,
+            repeat: -1,
+        });
+    }
+
+    // create run animations
+    if (!anims.exists('adventurer-run-down')) {
+        anims.create({
+            key: 'adventurer-run-down',
+            frames: anims.generateFrameNumbers('adventurer_run_down', { start: 0, end: 5 }),
+            frameRate: 8,
+            repeat: -1,
+        });
+    }
+    if (!anims.exists('adventurer-run-left')) {
+        anims.create({
+            key: 'adventurer-run-left',
+            frames: anims.generateFrameNumbers('adventurer_run_left', { start: 0, end: 5 }),
+            frameRate: 8,
+            repeat: -1,
+        });
+    }
+    if (!anims.exists('adventurer-run-right')) {
+        anims.create({
+            key: 'adventurer-run-right',
+            frames: anims.generateFrameNumbers('adventurer_run_right', { start: 0, end: 5 }),
+            frameRate: 8,
+            repeat: -1,
+        });
+    }
+    if (!anims.exists('adventurer-run-up')) {
+        anims.create({
+            key: 'adventurer-run-up',
+            frames: anims.generateFrameNumbers('adventurer_run_up', { start: 0, end: 5 }),
             frameRate: 8,
             repeat: -1,
         });
@@ -105,11 +162,35 @@ export const createAdventurer = (scene: Phaser.Scene, x: number, y: number) => {
         return currentAnim.key.replace('adventurer-idle-', '');
     };
 
+    const playRun = (dir: string) => {
+        const key = `adventurer-run-${dir}`;
+        if (sprite.anims.currentAnim?.key !== key) {
+            sprite.play(key);
+        }
+    }
+
+    const playIdle = (dir: string) => {
+        const key = `adventurer-idle-${dir}`;
+        if (sprite.anims.currentAnim?.key !== key) {
+            sprite.play(key);
+        }
+    }
+
+    const setPosition = (x: number, y: number) => {
+        sprite.setPosition(x, y);
+        if (collider.active) collider.setPosition(x, y);
+        if (overlap.active) overlap.setPosition(x, y);
+    }
+
+
     return {
         sprite,
         collider,
         overlap,
         lookAt,
         getDirection,
+        playRun,
+        playIdle,
+        setPosition
     };
 }

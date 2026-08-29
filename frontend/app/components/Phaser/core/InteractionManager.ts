@@ -18,11 +18,12 @@ export class InteractionManager {
 
     private activeAdventurer: ReturnType<typeof createAdventurer> | null = null;
     private adventurerColliding = false;
+    private hasTalkedToAdventurer = false;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
         if (scene.input.keyboard) {
-        this.interactKey = scene.input.keyboard.addKey('A');
+        this.interactKey = scene.input.keyboard.addKey('Z');
         }
     }
 
@@ -57,14 +58,36 @@ export class InteractionManager {
             ghost.hide();
         });
 
-        eventBus.on('ghost:talk', () => {
+        eventBus.on('ghost:talk', async () => {
+            const gameState = await getGameState();
+            const teamSize = gameState?.team?.length ?? 1;
             const ui = this.scene.scene.get('UIScene') as UIScene;
-            ui.playScript([{
-                type: 'text', 
-                text: 'Sozinho você não pode passar!',
-                speaker: 'Fantasma',
-                speakerColor: 'font_gold'
-            }])
+
+            if (teamSize >= 3) {
+                ui.playScript([{
+                    type: 'text',
+                    text: 'Agora vocês são suficientes! Podem passar.',
+                    speaker: 'Fantasma',
+                    speakerColor: 'font_gold'
+                }]);
+            }
+            if(teamSize > 1) {
+                ui.playScript([{
+                    type: 'text',
+                    text: 'Vocês ainda não são suficiente!',
+                    speaker: 'Fantasma',
+                    speakerColor: 'font_gold'
+                }]);
+            }
+
+            if (teamSize === 1) {
+                ui.playScript([{
+                    type: 'text',
+                    text: 'Sozinho... você jamais passará!',
+                    speaker: 'Fantasma',
+                    speakerColor: 'font_gold'
+                }])
+            }
         });
     }
 
@@ -103,10 +126,11 @@ export class InteractionManager {
         const missions = gameState?.missions || [];
 
         const backendHasSeenGhost = flags.hasSeenGhost || this.hasSeenGhost;
-        const pedrasCount = countItems(inventory, 'pedra_ouro');
+        const pedrasCount = countItems(inventory, 'item_gold');
         const hasDeliveryMission = missions.some(
             (m) => m.type === 'DELIVERY' && m.target === 'aventureiro' && !m.completed
         );
+
 
         // Helper local para evitar repetição de objeto
         const speak = (text: string): DialogueStep => ({
@@ -125,21 +149,35 @@ export class InteractionManager {
             ]);
         }
 
+
+        const deliveryCompleted = missions.some(
+            (m) => m.id === 'mission-adventurer-delivery' && m.completed
+        );
+
+        if (deliveryCompleted) {
+            return ui.playScript([speak('Estou com você! Vamos seguir nossa jornada.')]);
+        };
+
         // CASO 2: Viu o fantasma (Diálogo Principal)
-        const steps: DialogueStep[] = [
-            speak('Ah, você de novo! Precisa de ajuda?'),
-        ];
+        const steps: DialogueStep[] = [];
+
+        if (this.hasTalkedToAdventurer) {
+            steps.push(speak('Ah, você de novo! Precisa de ajuda?'));
+        }
+
+        this.hasTalkedToAdventurer = true;
 
         // SUB-CASO 2A: Tem pedras suficientes -> Entrega
         if (pedrasCount >= 3) {
             steps.push(speak(`Vejo que você tem ${pedrasCount} pedras de ouro! Perfeito, entrega para mim!`));
-            
-            const result = await sendGameAction('DELIVERY_REQUEST', { targetNpc: 'aventureiro' });
-            const responseText = result.accepted
-            ? 'Excelente! Agora posso seguir minha jornada. Obrigado!'
-            : 'Algo deu errado... Tente novamente.';
-
-            steps.push(speak(responseText));
+            await sendGameAction('ITEM_USED', { itemKey: 'item_gold', quantity: 3 });
+            const result = await sendGameAction('MISSION_COMPLETED', { missionId: 'mission-adventurer-delivery' });
+            if (result.accepted) {
+                steps.push(speak('Excelente! Agora posso seguir minha jornada. Obrigado!'));
+                eventBus.emit('delivery:completed');
+            } else {
+                steps.push(speak('Algo deu errado... Tente novamente.'));
+            }
             return ui.playScript(steps);
         }
 
@@ -168,14 +206,12 @@ export class InteractionManager {
     update(
         player: Phaser.Physics.Arcade.Sprite,
         doors: Door[],
-        _ghost?: ReturnType<typeof createGhost>
+        ghost: ReturnType<typeof createGhost>,
+        isInteractPressed: boolean,
+        dialoguePlaying: boolean
     ): void {
-        const isInteractPressed = Boolean(
-            this.interactKey && Phaser.Input.Keyboard.JustDown(this.interactKey)
-        );
-
         // 1. Processar interações de tecla (Input)
-        if (isInteractPressed) {
+        if (isInteractPressed && !dialoguePlaying) {
             if (this.activeDoor) {
             eventBus.emit('door:interact', { door: this.activeDoor });
             } else if (this.activeAdventurer) {

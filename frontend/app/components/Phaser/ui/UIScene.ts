@@ -103,6 +103,7 @@ export default class UIScene extends Phaser.Scene {
       } else {
         this.dialogueBox.hide();
         this.isPlaying = false;
+        eventBus.emit('dialogue:end');
       }
     }
   }

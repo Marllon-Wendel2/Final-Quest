@@ -1,5 +1,12 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
+function redirectToLogin() {
+  if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.href = '/';
+  }
+}
+
 async function getAuthHeaders(): Promise<HeadersInit> {
     return {
        'Content-Type': 'application/json', 
@@ -24,6 +31,7 @@ export async function sendGameAction (
         });
 
         if (!response.ok) {
+            if (response.status === 401) redirectToLogin();
             const errorData = await response.json().catch(() => ({}));
             return {
                 accepted: false,
@@ -50,6 +58,7 @@ export async function getGameState(): Promise<{
   version: number;
   userId: string;
   player: { x: number; y: number; direction: string };
+  adventurer?: { x: number; y: number; direction: string };
   inventory: Array<{ slotIndex: number; itemKey: string }>;
   flags: Record<string, boolean>;
   missions: Array<{
@@ -61,6 +70,7 @@ export async function getGameState(): Promise<{
     required: number;
     completed: boolean;
   }>;
+  team: string[];
   lastSaved: string;
 } | null> {
   try {
@@ -73,6 +83,7 @@ export async function getGameState(): Promise<{
 
     if (!response.ok) {
       console.error('[game-api] getGameState failed:', response.status);
+      if (response.status === 401) redirectToLogin();
       return null;
     }
 
