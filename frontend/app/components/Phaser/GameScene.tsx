@@ -12,6 +12,7 @@ import { eventBus } from './core/EventBus';
 import InventoryScene from './invetory/InventoryScene';
 import { getGameState, sendGameAction } from '@/api/game-api';
 import { GoldPickup } from '../animations/Phaser/minerals/gold';
+import { createAdventurerFamele } from '../animations/Phaser/animes/adventurerFamele';
 
 export default class GameScene extends Phaser.Scene {
     private player!: Phaser.Physics.Arcade.Sprite;
@@ -22,10 +23,15 @@ export default class GameScene extends Phaser.Scene {
     private doors: Door[] = [];
     private ghost!: ReturnType<typeof createGhost>;
     private adventurerMale!: ReturnType<typeof createAdventurer>;
+    private adventurerFamele!: ReturnType<typeof createAdventurerFamele>;
+    private adventurerFameleFollowing = false;
+    private adventurerFollowing = false;
     private lastSavedPos = { x: 0, y: 0 };
     private lastSavedAdvPos = { x: 0, y: 0 };
+    private lastSavedAdvFPos = { x: 0, y: 0 };
     private saveDebounce = 0;
     private saveAdvDebounce = 0;
+    private saveAdvFDebounce = 0;
     private interactKey!: Phaser.Input.Keyboard.Key;
 
     private golds: GoldPickup[] = [];
@@ -33,7 +39,6 @@ export default class GameScene extends Phaser.Scene {
     private wasDialoguePlaying = false;
 
     private team: string[] = ['ocultist'];
-    private adventurerFollowing = false;
     private pendingDeliveryRecruit = false;
 
     constructor() {
@@ -42,9 +47,10 @@ export default class GameScene extends Phaser.Scene {
 
     async create() {
       this.cameras.main.setViewport(0, 0, 720, 620);
+      this.physics.world.setBounds(0, 0, 608, 432);
       // 1. Setup do mapa
       this.mapManager = new MapManager(this);
-      const { map, grassLayer, waterLayer, roadsLayer, treesLayer } = this.mapManager.create();
+      const { map, grassLayer, waterLayer, roadsLayer, bridgeLayer, treesLayer } = this.mapManager.create();
       // 2. Criacao de entidades
       this.entityManager = new EntityManager(this);
 
@@ -59,6 +65,12 @@ export default class GameScene extends Phaser.Scene {
       if (shouldFollow) {
         this.team = ['ocultist', 'aventureiro'];
         this.adventurerFollowing = true;
+      }
+
+      // Restaurar aventureira follower do savedState
+      if (savedState?.team?.includes('aventureira')) {
+        this.team.push('aventureira');
+        this.adventurerFameleFollowing = true;
       }
 
       const startX = savedState?.player?.x ?? 150;
@@ -89,9 +101,10 @@ export default class GameScene extends Phaser.Scene {
       // Criar minerais
       // 3. Criar ghost (precisa de logica especial para NPC layer)
       const npcLayer = map.getObjectLayer('NPC');
+      const ghostDefeated = flags.ghostDefeated === true;
       if (npcLayer) {
         npcLayer.objects.forEach((obj) => {
-          if (obj.name === 'Fantasma' && obj.x !== undefined && obj.y !== undefined) {
+          if (obj.name === 'Fantasma' && obj.x !== undefined && obj.y !== undefined && !ghostDefeated) {
             this.ghost = this.entityManager.createGhost(obj.x, obj.y);
           }
 
@@ -102,12 +115,49 @@ export default class GameScene extends Phaser.Scene {
               const advY = savedAdv ? savedAdv.y : obj.y;
               this.adventurerMale = this.entityManager.createAventurer(advX, advY);
           }
+
+          if (obj.name === 'aventureira' && obj.x !== undefined && obj.y !== undefined) {
+            const savedAdvF = savedState?.adventurerFemale;
+            const advFX = savedAdvF ? savedAdvF.x : obj.x;
+            const advFY = savedAdvF ? savedAdvF.y : obj.y;
+            this.adventurerFamele = this.entityManager.createAventurerFamele(advFX, advFY);
+          }
         });
       }
+
+      // 3.1 Criar zona de fim de fase (ponto "end" na layer buildings)
+      const buildingsLayer = map.getObjectLayer('buildings');
+      if (buildingsLayer) {
+        buildingsLayer.objects.forEach((obj) => {
+          if (obj.name === 'end' && obj.x !== undefined && obj.y !== undefined) {
+            const endZone = this.add.zone(obj.x, obj.y, 32, 32);
+            this.physics.add.existing(endZone, true);
+            this.physics.add.collider(this.player, endZone, () => {
+              const ui = this.scene.get('UIScene') as UIScene;
+              ui.playScript([
+                {
+                  type: 'text',
+                  text: 'A ponte termina aqui...',
+                  speaker: 'Narrador',
+                  speakerColor: 'font_gold',
+                },
+                {
+                  type: 'text',
+                  text: 'Fase 1 concluída! Aguarde o restante do jogo ser desenvolvido...',
+                  speaker: 'Narrador',
+                  speakerColor: 'font_gold',
+                },
+              ]);
+            });
+          }
+        });
+      }
+
       // 4. Configurar colisoes
       this.physics.add.collider(this.player, waterLayer);
       this.physics.add.collider(this.player, grassLayer);
       this.physics.add.collider(this.player, roadsLayer);
+      if (bridgeLayer) this.physics.add.collider(this.player, bridgeLayer);
       if (treesLayer) this.physics.add.collider(this.player, treesLayer);
       this.physics.add.collider(this.player, buildings);
       
@@ -126,7 +176,14 @@ export default class GameScene extends Phaser.Scene {
       if (this.adventurerMale && !this.adventurerFollowing) {
         this.physics.add.collider(this.player, this.adventurerMale.collider);
         this.physics.add.overlap(this.player, this.adventurerMale.overlap, () => {
-          this.interactionManager.onAdventurerCollide(this.adventurerMale);
+          this.interactionManager.onAdventurerCollider(this.adventurerMale);
+        });
+      }
+
+      if (this.adventurerFamele && !this.adventurerFameleFollowing) {
+        this.physics.add.collider(this.player, this.adventurerFamele.collider)
+        this.physics.add.overlap(this.player, this.adventurerFamele.overlap, () => {
+          this.interactionManager.onAdventureFameleCollider(this.adventurerFamele);
         });
       }
 
@@ -149,6 +206,19 @@ export default class GameScene extends Phaser.Scene {
         if (this.pendingDeliveryRecruit && !this.adventurerFollowing && this.adventurerMale) {
           this.pendingDeliveryRecruit = false;
           this.enableAdventurerFollower();
+        }
+      });
+
+      eventBus.on('aventureira:mission-complete', () => {
+        this.enableAdventurerFameleFollower()
+      });
+
+      eventBus.on('ghost:defeated', async () => {
+        if (this.ghost) {
+          this.ghost.collider?.destroy();
+          this.ghost.overlap?.destroy();
+          this.ghost.hide();
+          await sendGameAction('FLAG_SET', { key: 'ghostDefeated', value: true });
         }
       });
 
@@ -242,6 +312,23 @@ export default class GameScene extends Phaser.Scene {
         }
       }
 
+      if (this.adventurerFameleFollowing && this.adventurerFamele) {
+        this.updateFollowerFamele();
+
+        // Salvar posição da aventureira periodicamente (a cada 2s se houve movimento)
+        const afx = Math.round(this.adventurerFamele.sprite.x);
+        const afy = Math.round(this.adventurerFamele.sprite.y);
+        if (
+          time > this.saveAdvFDebounce &&
+          (afx !== this.lastSavedAdvFPos.x || afy !== this.lastSavedAdvFPos.y)
+        ) {
+          const afDir = this.adventurerFamele.sprite.getData('direction') || 'down';
+          sendGameAction('ADVENTURER_FEMALE_MOVED', { x: afx, y: afy, direction: afDir });
+          this.lastSavedAdvFPos = { x: afx, y: afy };
+          this.saveAdvFDebounce = time + 2000;
+        }
+      }
+
     }
 
     private async collectGold(gold: GoldPickup): Promise<void> {
@@ -295,6 +382,15 @@ export default class GameScene extends Phaser.Scene {
       await sendGameAction('TEAM_UPDATED', { team: this.team });
     }
 
+    private async enableAdventurerFameleFollower(): Promise<void> {
+      if (this.adventurerFameleFollowing) return;
+      this.adventurerFameleFollowing = true;
+      this.team.push('aventureira');
+      this.adventurerFamele.collider?.destroy();
+      this.adventurerFamele.overlap?.destroy();
+      await sendGameAction('TEAM_UPDATED', { team: this.team });
+    }
+
     private updateFollower(): void {
       const dir = this.player.getData('direction') || 'down';
       const adv = this.adventurerMale;
@@ -315,6 +411,31 @@ export default class GameScene extends Phaser.Scene {
           const newX = adv.sprite.x + dx * LERP;
           const newY = adv.sprite.y + dy * LERP;
           adv.sprite.setPosition(newX, newY);
+          adv.playRun(dir);
+          adv.sprite.setData('direction', dir);
+      } else {
+          adv.playIdle(dir);
+      }
+    }
+
+    private updateFollowerFamele(): void {
+      const dir = this.player.getData('direction') || 'down';
+      const adv = this.adventurerFamele;
+      const OFFSET = 20;
+      const LERP = 0.05;
+      let targetX = this.player.x;
+      let targetY = this.player.y;
+      switch (dir) {
+          case 'down':  targetY -= OFFSET; break;
+          case 'up':    targetY += OFFSET; break;
+          case 'left':  targetX += OFFSET; break;
+          case 'right': targetX -= OFFSET + 20; break;
+      }
+      const dx = targetX - adv.sprite.x;
+      const dy = targetY - adv.sprite.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > 5) {
+          adv.sprite.setPosition(adv.sprite.x + dx * LERP, adv.sprite.y + dy * LERP);
           adv.playRun(dir);
           adv.sprite.setData('direction', dir);
       } else {
