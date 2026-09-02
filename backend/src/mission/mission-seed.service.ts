@@ -10,7 +10,8 @@ export class MissionSeedService implements OnModuleInit {
   async onModuleInit() {
     const count = await this.prisma.mission.count();
     if (count > 0) {
-      this.logger.log('Missões já existem no banco, seed ignorado');
+      this.logger.log('Missões já existem no banco, verificando missão do fantasma...');
+      await this.ensureGhostMissionExists();
       return;
     }
 
@@ -94,9 +95,39 @@ export class MissionSeedService implements OnModuleInit {
             flag: 'hasSeenGhost',
           },
         },
+
+        {
+          title: 'Desafie o Fantasma',
+          description:
+            'O fantasma desafia seu grupo! Vença o MemoryGame para prosseguir.',
+          points: 100,
+          frequency: 'ONCE',
+          challengeType: 'MEMORY',
+        },
       ],
     });
 
-    this.logger.log('7 missões criadas com sucesso!');
+    this.logger.log('8 missões criadas com sucesso!');
+  }
+
+  private async ensureGhostMissionExists(): Promise<void> {
+    const ghostMission = await this.prisma.mission.findFirst({
+      where: { title: 'Desafie o Fantasma' },
+    });
+
+    if (ghostMission) return;
+
+    await this.prisma.mission.create({
+      data: {
+        title: 'Desafie o Fantasma',
+        description:
+          'O fantasma desafia seu grupo! Vença o MemoryGame para prosseguir.',
+        points: 100,
+        frequency: 'ONCE',
+        challengeType: 'MEMORY',
+      },
+    });
+
+    this.logger.log('Missão "Desafie o Fantasma" criada (atualização)');
   }
 }
