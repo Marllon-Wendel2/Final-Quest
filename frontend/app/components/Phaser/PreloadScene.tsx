@@ -9,6 +9,7 @@ import { loadUI, loadInventory } from '../animations/Phaser/ui/ui';
 import { loadGoldSprite } from '../animations/Phaser/minerals/gold';
 import { loadAudio } from '../animations/Phaser/audio/audio';
 import { loadAdventurerSprite } from '../animations/Phaser/animes/adventurer';
+import { loadAdventurerFameleSprite } from '../animations/Phaser/animes/adventurerFamele';
 
 export default class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -27,6 +28,7 @@ export default class PreloadScene extends Phaser.Scene {
     loadBridges(this);
     loadInventory(this);
     loadGoldSprite(this);
+    loadAdventurerFameleSprite(this)
   }
 
   create() {

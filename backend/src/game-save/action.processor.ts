@@ -289,6 +289,13 @@ export class ActionProcessor {
           direction: command.payload.direction as string,
         };
         break;
+      case 'ADVENTURER_FEMALE_MOVED':
+        newState.adventurerFemale = {
+          x: command.payload.x as number,
+          y: command.payload.y as number,
+          direction: command.payload.direction as string,
+        };
+        break;
     }
     return newState;
   }

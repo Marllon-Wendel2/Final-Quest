@@ -7,7 +7,7 @@ import MissionsList from './components/MissionsList';
 import RankingList from './components/RankingList';
 import ServerWakeUpBanner from './components/ServerWakeUpBanner';
 import { useAuth } from './contexts/AuthContext';
-import { getMe } from '../api/client';
+import { getMe, User } from '../api/client';
 import './globals.css';
 
 export default function Home() {

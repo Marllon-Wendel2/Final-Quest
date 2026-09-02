@@ -15,6 +15,7 @@ export const GameActionTypes = [
   'MINIGAME_RESULT',
   'TEAM_UPDATED',
   'ADVENTURER_MOVED',
+  'ADVENTURER_FEMALE_MOVED',
 ] as const;
 
 export type GameActionType = (typeof GameActionTypes)[number];

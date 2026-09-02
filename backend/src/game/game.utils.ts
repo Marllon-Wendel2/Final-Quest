@@ -52,7 +52,11 @@ export async function findGamesByUserId<T extends BaseGame>(
 
   for (const key of keys) {
     const game = await getGame<T>(redis, prefix, key.replace(prefix, ''));
-    if (game && game.userId === userId && (!statusFilter || game.status === statusFilter)) {
+    if (
+      game &&
+      game.userId === userId &&
+      (!statusFilter || game.status === statusFilter)
+    ) {
       games.push(game);
     }
   }
