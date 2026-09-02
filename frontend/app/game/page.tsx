@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useAuth } from '../contexts/AuthContext';
+import ChallengeOverlay from '../components/minigames/ChallengeOverlay';
 
 const PhaserGame = dynamic(() => import('./PhaserGame'), {
   ssr: false,
@@ -56,8 +57,10 @@ export default function GamePage() {
       alignItems: 'center',
       minHeight: '40vh',
       background: '#0d1a0d',
+      position: 'relative',
     }}>
       <PhaserGame />
+      <ChallengeOverlay />
     </main>
   );
 }

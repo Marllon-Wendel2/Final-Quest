@@ -7,6 +7,7 @@ import { createDoors, Door } from '../../animations/Phaser/doors/door';
 import { createGhost } from '../../animations/Phaser/animes/ghost';
 import { createMinerals, GoldPickup } from '../../animations/Phaser/minerals/gold';
 import { createAdventurer } from '../../animations/Phaser/animes/adventurer';
+import { createAdventurerFamele } from '../../animations/Phaser/animes/adventurerFamele';
 
 export class EntityManager {
   private scene: Phaser.Scene;
@@ -37,6 +38,10 @@ export class EntityManager {
 
   createAventurer(x: number, y: number): ReturnType<typeof createAdventurer> {
     return createAdventurer(this.scene, x, y);
+  }
+
+  createAventurerFamele(x: number, y: number): ReturnType<typeof createAdventurerFamele> {
+    return createAdventurerFamele(this.scene, x, y)
   }
 
   createMinerals(map: Phaser.Tilemaps.Tilemap): GoldPickup[] {

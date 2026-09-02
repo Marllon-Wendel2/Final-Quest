@@ -63,6 +63,8 @@ export default class UIScene extends Phaser.Scene {
     if (this.dialogueQueue.length === 0) {
       this.isPlaying = false;
       this.pressZText.setAlpha(0);
+      this.dialogueBox.hide();
+      eventBus.emit('dialogue:end');
       return;
     }
 
@@ -81,7 +83,7 @@ export default class UIScene extends Phaser.Scene {
         break;
 
       case 'event':
-        this.events.emit(step.emit, step.data);
+        eventBus.emit(step.emit, step.data);
         this.processNextStep();
         break;
 

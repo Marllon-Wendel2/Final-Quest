@@ -10,6 +10,7 @@ export interface GameState {
   userId: string;
   player: { x: number; y: number; direction: string };
   adventurer?: { x: number; y: number; direction: string };
+  adventurerFemale?: { x: number; y: number; direction: string };
   inventory: Array<{ slotIndex: number; itemKey: string }>;
   flags: Record<string, boolean>;
   missions: Array<{

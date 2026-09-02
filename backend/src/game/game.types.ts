@@ -61,3 +61,10 @@ export const MEMORY_GAME_MAX_TIME = 60;
 export const MEMORY_GAME_MAX_MOVES = 20;
 export const MEMORY_GAME_TTL = 120;
 export const MEMORY_CARD_BOMB_PENALTY = 2;
+
+export const CARD_DISTRIBUTION: { type: MemoryCardType; count: number }[] = [
+  { type: 'character', count: 6 }, // 3 pares
+  { type: 'bomb', count: 2 },
+  { type: 'star', count: 1 },
+  { type: 'empty', count: 6 },
+];

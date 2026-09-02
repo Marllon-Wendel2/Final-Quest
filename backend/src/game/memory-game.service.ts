@@ -74,13 +74,16 @@ export class MemoryGameService {
     cardIndex: number,
   ): Promise<FlipResult> {
     const game = await this.getGame(gameId);
+
     if (!game) throw new NotFoundException(`Game not found: ${gameId}`);
 
     validateOwnership(game, userId);
     validateStatus(game, 'playing');
 
     const now = Date.now();
+
     const elapsed = Math.floor((now - game.lastTickAt) / 1000);
+
     if (elapsed >= 1) {
       game.timeLeft = Math.max(0, game.timeLeft - elapsed);
       game.lastTickAt = now;

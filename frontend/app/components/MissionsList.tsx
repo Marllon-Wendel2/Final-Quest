@@ -5,6 +5,7 @@ import { AvailableMission, completeMission, getAvailableMissions } from '../../a
 import VictoryAnimation from './VictoryAnimation';
 
 import ChallengeRouter from './minigames/ChallengeRouter';
+import { eventBus } from './Phaser/core/EventBus';
 
 interface MissionsListProps {
   onMissionComplete?: () => void;
@@ -118,6 +119,29 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
       fetchMissions();
     }
   }, [countdowns, fetchMissions]);
+
+  useEffect(() => {
+    const handleAventureiraChallenge = (data?: {missionId: string}) => {
+      const mission = missions.find(
+            (m) => m.id === data?.missionId || m.challengeType === 'TIC_TAC_TOE'
+        );
+
+      if (mission && mission.challengeType !== 'NONE') {
+          setActiveChallenge({
+              missionId: mission.id,
+              challengeType: mission.challengeType,
+              title: mission.title,
+              points: mission.points,
+          });
+      }
+    };
+
+    eventBus.on('aventureira:challenge', handleAventureiraChallenge);
+
+    return () => {
+      eventBus.off('aventureira:challenge', handleAventureiraChallenge);
+    };
+  }, [missions]);
 
   const handleComplete = async (
     missionId: string,
