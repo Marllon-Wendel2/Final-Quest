@@ -15,6 +15,7 @@ import {
 } from '../api/socket';
 import { MemoryCard, MemoryGameStatus } from '../app/types/memory-game';
 import { GameResult } from '../app/components/GameResultAnimation';
+import { sendGameAction } from '@/api/game-api';
 
 const TIMER_SYNC_INTERVAL = 3000;
 
@@ -200,11 +201,12 @@ export function useMemoryGame(
 
   const handleResultComplete = useCallback(() => {
     if (gameResult === 'won') {
+      sendGameAction('MISSION_COMPLETED', { missionId });
       onSuccessRef.current();
     }
     setGameResult(null);
     onClose();
-  }, [gameResult, onClose]);
+  }, [gameResult, missionId, onClose]);
 
   const statusText = (() => {
     switch (status) {

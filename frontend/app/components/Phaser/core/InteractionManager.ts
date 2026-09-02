@@ -4,6 +4,7 @@ import UIScene from '../ui/UIScene';
 import { Door } from '../../animations/Phaser/doors/door';
 import { createGhost } from '../../animations/Phaser/animes/ghost';
 import { createAdventurer } from '../../animations/Phaser/animes/adventurer';
+import { createAdventurerFamele } from '../../animations/Phaser/animes/adventurerFamele'
 import { DialogueStep } from '../ui/dialogue-types';
 import { countItems, getGameState, sendGameAction } from '@/api/game-api';
 
@@ -18,6 +19,8 @@ export class InteractionManager {
 
     private activeAdventurer: ReturnType<typeof createAdventurer> | null = null;
     private adventurerColliding = false;
+    private activeAdventurerFamele: ReturnType<typeof createAdventurerFamele> | null = null;
+    private adventurerFameleColliding = false;
     private hasTalkedToAdventurer = false;
 
     constructor(scene: Phaser.Scene) {
@@ -64,29 +67,38 @@ export class InteractionManager {
             const ui = this.scene.scene.get('UIScene') as UIScene;
 
             if (teamSize >= 3) {
-                ui.playScript([{
-                    type: 'text',
-                    text: 'Agora vocês são suficientes! Podem passar.',
-                    speaker: 'Fantasma',
-                    speakerColor: 'font_gold'
-                }]);
-            }
-            if(teamSize > 1) {
+                ui.playScript([
+                    {
+                        type: 'text',
+                        text: 'Vocês são muitos... mas são espertos o suficiente?',
+                        speaker: 'Fantasma',
+                        speakerColor: 'font_gold',
+                    },
+                    {
+                        type: 'text',
+                        text: 'Mostrem que sua mente é afiada quanto suas espadas!',
+                        speaker: 'Fantasma',
+                        speakerColor: 'font_gold',
+                    },
+                    {
+                        type: 'event',
+                        emit: 'ghost:challenge',
+                    },
+                ]);
+            } else if (teamSize > 1) {
                 ui.playScript([{
                     type: 'text',
                     text: 'Vocês ainda não são suficiente!',
                     speaker: 'Fantasma',
-                    speakerColor: 'font_gold'
+                    speakerColor: 'font_gold',
                 }]);
-            }
-
-            if (teamSize === 1) {
+            } else {
                 ui.playScript([{
                     type: 'text',
                     text: 'Sozinho... você jamais passará!',
                     speaker: 'Fantasma',
-                    speakerColor: 'font_gold'
-                }])
+                    speakerColor: 'font_gold',
+                }]);
             }
         });
     }
@@ -110,10 +122,17 @@ export class InteractionManager {
 
     setupAdventurerInteraction(): void {}
 
-    onAdventurerCollide(adventurer: ReturnType<typeof createAdventurer>): void {
+    onAdventurerCollider(adventurer: ReturnType<typeof createAdventurer>): void {
         this.adventurerColliding = true;
         if (!this.activeAdventurer) {
             this.activeAdventurer = adventurer;
+        }
+    }
+
+    onAdventureFameleCollider(adventurer: ReturnType<typeof createAdventurerFamele>): void {
+        this.adventurerFameleColliding = true;
+        if (!this.activeAdventurerFamele) {
+            this.activeAdventurerFamele = adventurer;
         }
     }
 
@@ -200,6 +219,26 @@ export class InteractionManager {
         ui.playScript(steps);
     }
 
+    private async startAdventurerFameleDialogue() {
+        const ui = this.scene.scene.get('UIScene') as UIScene;
+        
+        const speak = (text: string): DialogueStep => ({
+            type: 'text',
+            text,
+            speaker: 'Aventureira',
+            speakerColor: 'font_gold',
+        })
+
+        await sendGameAction('ADVENTURER_TALKED', {});
+        ui.playScript([
+            speak('Olha só, acha que pode me vencer?'),
+            {
+                type: 'event',
+                emit: 'aventureira:challenge'
+            }
+        ])
+    }
+
     /**
      * Atualiza a cada frame (chamado pelo GameScene)
      */
@@ -214,8 +253,12 @@ export class InteractionManager {
         if (isInteractPressed && !dialoguePlaying) {
             if (this.activeDoor) {
             eventBus.emit('door:interact', { door: this.activeDoor });
-            } else if (this.activeAdventurer) {
+            } 
+            if (this.activeAdventurer) {
             this.startAdventurerDialogue();
+            }
+            if (this.activeAdventurerFamele) {
+                this.startAdventurerFameleDialogue()
             }
         }
 
@@ -242,6 +285,12 @@ export class InteractionManager {
             this.activeAdventurer = null;
         }
         this.adventurerColliding = false;
+
+        if (this.activeAdventurerFamele && !this.adventurerFameleColliding) {
+            this.activeAdventurerFamele = null
+        }
+
+        this.adventurerFameleColliding = false
         }
 
 

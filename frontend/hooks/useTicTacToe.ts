@@ -10,6 +10,7 @@ import {
     onGameError,
     offGameEvents,
 } from '../api/socket'
+import { sendGameAction } from '../api/game-api'
 import { GameResult } from '../app/components/GameResultAnimation';
 
 export type GameStatus = 'waiting' | 'playing' | 'won' | 'lost' | 'draw';
@@ -79,11 +80,12 @@ export function useTicTacToe(
 
     const handleResultComplete = useCallback(() => {
         if (gameResult === 'won') {
-        onSuccessRef.current();
+            sendGameAction('MISSION_COMPLETED', { missionId });
+            onSuccessRef.current();
         }
         setGameResult(null);
         onClose();
-    }, [gameResult, onClose]);
+    }, [gameResult, missionId, onClose]);
 
     const statusText = (() => {
         switch (status) {
