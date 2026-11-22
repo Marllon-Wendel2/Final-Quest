@@ -12,15 +12,48 @@ model User {
   name         String
   hashPassword String          @map("hash_password")
   points       Int             @default(0)
+  certificados String[]        @default([])
   createdAt    DateTime        @default(now()) @map("created_at")
   updatedAt    DateTime        @updatedAt @map("updated_at")
   role         Role            @default(USER)
   gameEvents   GameEvent[]
-  gameSave     GameSave?
-  missions     PlayerMission[]
-  save         Save?
+  gameSave         GameSave?
+  missions         PlayerMission[]
+  save             Save?
+  extensionSurveys ExtensionSurvey[]
 
   @@map("users")
+}
+
+model ExtensionSurvey {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId   String @map("user_id") @db.Uuid
+  courseId String @default("logicaGuanabara") @map("course_id")
+
+  preSubmittedAt   DateTime? @map("pre_submitted_at")
+  ageRange         String?   @map("age_range")
+  profileType      String?   @map("profile_type")
+  educationLevel   String?   @map("education_level")
+  cityState        String?   @map("city_state")
+  priorProgramming Boolean?  @map("prior_programming")
+  preConfidence    Int?      @map("pre_confidence")
+  expectation      String?
+  consentAccepted  Boolean   @default(false) @map("consent_accepted")
+
+  postSubmittedAt    DateTime? @map("post_submitted_at")
+  postConfidence     Int?      @map("post_confidence")
+  gamificationRating Int?      @map("gamification_rating")
+  overallRating      Int?      @map("overall_rating")
+  difficulties       String?
+  highlights         String?
+  suggestions        String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@map("extension_surveys")
 }
 
 model Mission {
@@ -108,6 +141,7 @@ enum ChallengeType {
   NONE
   MEMORY
   TIC_TAC_TOE
+  VIDEO_LESSON
 }
 
 enum MissionType {

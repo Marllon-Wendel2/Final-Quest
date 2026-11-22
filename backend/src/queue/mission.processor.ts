@@ -102,6 +102,10 @@ export class MissionProcessorService {
         `Missão completada via fila: user=${userId} mission=${missionId} points=${mission.points}`,
       );
 
+      if ((mission.challengeType as string) === 'VIDEO_LESSON') {
+        await this.ensureLogicaCertificateIfComplete(userId);
+      }
+
       return result;
     } catch (error: unknown) {
       if (
@@ -111,6 +115,67 @@ export class MissionProcessorService {
         throw new ConflictException('Missão já completada');
       }
       throw error;
+    }
+  }
+
+  private async ensureLogicaCertificateIfComplete(
+    userId: string,
+  ): Promise<void> {
+    try {
+      const videoMissions = await this.prismaService.mission.findMany({
+        where: {
+          challengeType: 'VIDEO_LESSON' as any,
+          title: { startsWith: 'Aula ' },
+        },
+        select: { id: true },
+      });
+
+      if (videoMissions.length < 15) return;
+
+      const missionIds = videoMissions.map((m) => m.id);
+      const completed = await this.prismaService.playerMission.findMany({
+        where: {
+          userId,
+          missionId: { in: missionIds },
+        },
+        select: { missionId: true },
+      });
+
+      const uniqueCompleted = new Set(completed.map((c) => c.missionId));
+      if (uniqueCompleted.size < 15) return;
+
+      // Certificado só é liberado após o aluno responder ao formulário pós-curso
+      const survey = await this.prismaService.extensionSurvey.findUnique({
+        where: {
+          userId_courseId: { userId, courseId: 'logicaGuanabara' },
+        },
+        select: { postSubmittedAt: true },
+      });
+      if (!survey?.postSubmittedAt) return;
+
+      const user = await this.prismaService.user.findUnique({
+        where: { id: userId },
+      });
+      if (!user) return;
+
+      const currentCerts =
+        (user as { certificados?: string[] }).certificados ?? [];
+      if (currentCerts.includes('logicaGuanabara')) return;
+
+      await this.prismaService.user.update({
+        where: { id: userId },
+        data: {
+          certificados: [...currentCerts, 'logicaGuanabara'],
+        } as any,
+      });
+
+      this.logger.log(
+        `Certificado "logicaGuanabara" concedido ao usuário ${userId}`,
+      );
+    } catch (err) {
+      this.logger.warn(
+        `Falha ao verificar certificado logicaGuanabara para user=${userId}: ${String(err)}`,
+      );
     }
   }
 }

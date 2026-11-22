@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "certificados" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];
