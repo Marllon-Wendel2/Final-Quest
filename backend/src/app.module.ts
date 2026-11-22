@@ -12,6 +12,7 @@ import { QueueModule } from './queue/queue.module';
 import { RedisModule } from './redis/redis.module';
 import { GameModule } from './game/game.module';
 import { GameSaveModule } from './game-save/game-save.module';
+import { ExtensionSurveyModule } from './extension-survey/extension-survey.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { GameSaveModule } from './game-save/game-save.module';
     RedisModule.forRoot(),
     GameModule,
     GameSaveModule,
+    ExtensionSurveyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -8,6 +8,7 @@ export function makeUser(overrides?: Partial<User>): User {
     hashPassword: 'hashed-password',
     role: 'USER',
     points: 0,
+    certificados: [],
     createdAt: new Date('2026-01-01'),
     updatedAt: new Date('2026-01-01'),
     ...overrides,

@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "ChallengeType" ADD VALUE IF NOT EXISTS 'VIDEO_LESSON';

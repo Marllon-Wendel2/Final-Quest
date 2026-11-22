@@ -83,7 +83,13 @@ export class AuthController {
   getMe(
     @Request()
     req: {
-      user: { id: string; name: string; email: string; points: number };
+      user: {
+        id: string;
+        name: string;
+        email: string;
+        points: number;
+        certificados?: string[];
+      };
     },
   ) {
     return req.user;

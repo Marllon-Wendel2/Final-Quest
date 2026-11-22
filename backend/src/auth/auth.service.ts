@@ -46,7 +46,9 @@ export class AuthService {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
         points: user.points,
+        certificados: (user as { certificados?: string[] }).certificados ?? [],
       };
     } catch (error) {
       if (error instanceof ConflictException) {
@@ -81,7 +83,9 @@ export class AuthService {
       id: user.id,
       name: user.name,
       email: user.email,
+      role: user.role,
       points: user.points,
+      certificados: (user as { certificados?: string[] }).certificados ?? [],
     };
   }
 

@@ -49,7 +49,9 @@ export class PlayerMissionService {
   }
 
   async getAvailableMissions(userId: string) {
-    const missions = await this.prismaService.mission.findMany();
+    const missions = await this.prismaService.mission.findMany({
+      orderBy: { createdAt: 'asc' },
+    });
 
     const missionsWithStatus = await Promise.all(
       missions.map(async (mission) => {
@@ -105,7 +107,51 @@ export class PlayerMissionService {
       }),
     );
 
+    const completedLessonMissions = missionsWithStatus.filter(
+      (m) =>
+        (m.challengeType as string) === 'VIDEO_LESSON' &&
+        m.title.startsWith('Aula ') &&
+        m.isCompleted,
+    );
+
+    if (completedLessonMissions.length >= 15) {
+      await this.ensureCertificateIfSurveyCompleted(userId, 'logicaGuanabara');
+    }
+
     return missionsWithStatus;
+  }
+
+  private async ensureCertificateIfSurveyCompleted(
+    userId: string,
+    certificateId: string,
+  ): Promise<void> {
+    try {
+      const survey = await this.prismaService.extensionSurvey.findUnique({
+        where: {
+          userId_courseId: { userId, courseId: certificateId },
+        },
+        select: { postSubmittedAt: true },
+      });
+      if (!survey?.postSubmittedAt) return;
+
+      const user = await this.prismaService.user.findUnique({
+        where: { id: userId },
+      });
+      if (!user) return;
+
+      const currentCerts =
+        (user as { certificados?: string[] }).certificados ?? [];
+      if (currentCerts.includes(certificateId)) return;
+
+      await this.prismaService.user.update({
+        where: { id: userId },
+        data: {
+          certificados: [...currentCerts, certificateId],
+        } as any,
+      });
+    } catch {
+      // ignore if migration hasn't run yet
+    }
   }
 
   async getPlayerHistory(userId: string) {

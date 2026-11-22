@@ -10,6 +10,8 @@ export const CreateUserSchema = z.object({
 export type CreateUserDto = z.infer<typeof CreateUserSchema>;
 export const CreateUserPipe = new ZodValidationPipe(CreateUserSchema);
 
-export const UpdateUserSchema = CreateUserSchema.partial();
+export const UpdateUserSchema = CreateUserSchema.partial().extend({
+  certificados: z.array(z.string()).optional(),
+});
 export type UpdateUserDto = z.infer<typeof UpdateUserSchema>;
 export const UpdateUserPipe = new ZodValidationPipe(UpdateUserSchema);

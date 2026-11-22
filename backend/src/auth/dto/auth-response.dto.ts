@@ -5,7 +5,9 @@ export const AuthResponseSchema = z.object({
   id: z.string(),
   email: z.string().email(),
   name: z.string(),
+  role: z.enum(['USER', 'ADMIN']).optional(),
   points: z.number().int().default(0),
+  certificados: z.array(z.string()).default([]),
 });
 
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;

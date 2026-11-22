@@ -1,10 +1,15 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { AvailableMission, completeMission, getAvailableMissions } from '../../api/player-mission';
 import VictoryAnimation from './VictoryAnimation';
+import { useAuth } from '../contexts/AuthContext';
 
 import ChallengeRouter from './minigames/ChallengeRouter';
+import { extractLessonNumber, VIDEO_LESSONS } from './minigames/VideoLesson/lessons.config';
+import CourseCertificateModal from './minigames/VideoLesson/CourseCertificateModal';
+import ExtensionSurveyModal from './minigames/VideoLesson/ExtensionSurveyModal';
+import { getMyExtensionSurvey } from '../../api/extension-survey';
 import { eventBus } from './Phaser/core/EventBus';
 
 interface MissionsListProps {
@@ -49,6 +54,7 @@ function getTimeUntilNextReset(frequency: AvailableMission['frequency']): number
 }
 
 export default function MissionsList({ onMissionComplete, bgAudioRef }: MissionsListProps) {
+  const { user, setUser } = useAuth();
   const [missions, setMissions] = useState<AvailableMission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -56,25 +62,69 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
   const [justCompletedId, setJustCompletedId] = useState<string | null>(null);
   const [floatingPoints, setFloatingPoints] = useState<FloatingPoints[]>([]);
   const [victoryData, setVictoryData] = useState<{ points: number; missionTitle: string } | null>(null);
+  const [showCertificate, setShowCertificate] = useState(false);
+  const [surveyModalMode, setSurveyModalMode] = useState<'pre' | 'post' | null>(null);
+  const [surveyStatus, setSurveyStatus] = useState<{
+    loaded: boolean;
+    preCompleted: boolean;
+    postCompleted: boolean;
+  }>({ loaded: false, preCompleted: false, postCompleted: false });
   const [countdowns, setCountdowns] = useState<Record<string, number>>({});
   const containerRef = useRef<HTMLDivElement>(null);
   const victorySfxRef = useRef<HTMLAudioElement>(null);
   const floatingIdCounter = useRef(0);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const [activeChallenge, setActiveChallenge] = useState<{
+  const pendingChallengeAfterPreRef = useRef<{
     missionId: string;
     challengeType: string;
     title: string;
     points: number;
   } | null>(null);
 
+  const [activeChallenge, setActiveChallenge] = useState<{
+    missionId: string;
+    challengeType: string;
+    title: string;
+    points: number;
+    isCompleted?: boolean;
+  } | null>(null);
+
+  // Pause page background audio while a VIDEO_LESSON modal is open, and resume when closed
+  useEffect(() => {
+    if (activeChallenge?.challengeType !== 'VIDEO_LESSON') return;
+
+    const bg = bgAudioRef?.current;
+    if (!bg) return;
+
+    const keepPaused = () => {
+      bg.pause();
+    };
+
+    bg.pause();
+    bg.addEventListener('play', keepPaused);
+
+    return () => {
+      bg.removeEventListener('play', keepPaused);
+      if (!bg.muted) {
+        bg.play().catch(() => {});
+      }
+    };
+  }, [activeChallenge?.challengeType, bgAudioRef]);
+
   const fetchMissions = useCallback(() => {
     getAvailableMissions()
       .then((data) => {
-        setMissions(data);
+        const sorted = [...data].sort((a, b) => {
+          const numA = extractLessonNumber(a.title);
+          const numB = extractLessonNumber(b.title);
+          if (numA !== null && numB !== null) return numA - numB;
+          if (numA !== null) return -1;
+          if (numB !== null) return 1;
+          return 0;
+        });
+        setMissions(sorted);
         const initial: Record<string, number> = {};
-        for (const m of data) {
+        for (const m of sorted) {
           if (m.isCompleted && (m.frequency === 'MINUTE' || m.frequency === 'HOUR')) {
             initial[m.id] = getTimeUntilNextReset(m.frequency);
           }
@@ -89,6 +139,37 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
     fetchMissions();
   }, [fetchMissions]);
 
+  useEffect(() => {
+    let active = true;
+    getMyExtensionSurvey('logicaGuanabara')
+      .then((res) => {
+        if (!active) return;
+        setSurveyStatus({
+          loaded: true,
+          preCompleted: res.preCompleted,
+          postCompleted: res.postCompleted,
+        });
+        if (!res.preCompleted) {
+          const promptKey = `fq_pre_prompted_${user?.id || 'guest'}`;
+          try {
+            if (!sessionStorage.getItem(promptKey)) {
+              sessionStorage.setItem(promptKey, '1');
+              setSurveyModalMode('pre');
+            }
+          } catch {
+            setSurveyModalMode('pre');
+          }
+        }
+      })
+      .catch(() => {
+        if (!active) return;
+        setSurveyStatus((prev) => ({ ...prev, loaded: true }));
+      });
+    return () => {
+      active = false;
+    };
+  }, [user?.id]);
+
   // Countdown tick
   useEffect(() => {
     if (countdownIntervalRef.current) {
@@ -97,8 +178,10 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
 
     countdownIntervalRef.current = setInterval(() => {
       setCountdowns((prev) => {
+        const entries = Object.entries(prev);
+        if (entries.length === 0) return prev;
         const next: Record<string, number> = {};
-        for (const [id, ms] of Object.entries(prev)) {
+        for (const [id, ms] of entries) {
           next[id] = Math.max(0, ms - 1000);
         }
         return next;
@@ -150,6 +233,12 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
     title: string,
     e: React.MouseEvent,
   ) => {
+    if (challengeType === 'VIDEO_LESSON' && surveyStatus.loaded && !surveyStatus.preCompleted) {
+      pendingChallengeAfterPreRef.current = { missionId, challengeType, title, points };
+      setSurveyModalMode('pre');
+      return;
+    }
+
     if (challengeType !== 'NONE') {
       setActiveChallenge({ missionId, challengeType, title, points });
       return;
@@ -220,6 +309,84 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
   const completedCount = missions.filter((m) => m.isCompleted).length;
   const totalCount = missions.length;
   const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+
+  const videoLessonMissions = useMemo(
+    () =>
+      missions.filter(
+        (m) => m.challengeType === 'VIDEO_LESSON' && extractLessonNumber(m.title) !== null,
+      ),
+    [missions],
+  );
+
+  const completedVideoLessonsCount = useMemo(() => {
+    const completedNumbers = new Set<number>();
+    for (const m of videoLessonMissions) {
+      const num = extractLessonNumber(m.title);
+      if (m.isCompleted && num !== null) {
+        completedNumbers.add(num);
+      }
+    }
+    return completedNumbers.size;
+  }, [videoLessonMissions]);
+
+  const totalCourseLessons = VIDEO_LESSONS.length;
+  const allCourseLessonsCompleted =
+    videoLessonMissions.length >= totalCourseLessons &&
+    completedVideoLessonsCount >= totalCourseLessons;
+
+  const userCertificates = useMemo(() => {
+    const set = new Set<string>(user?.certificados ?? []);
+    if (allCourseLessonsCompleted && surveyStatus.postCompleted) {
+      set.add('logicaGuanabara');
+    }
+    return Array.from(set);
+  }, [user?.certificados, allCourseLessonsCompleted, surveyStatus.postCompleted]);
+  const hasAnyCertificate = userCertificates.length > 0;
+  const needsPostSurveyForCertificate =
+    allCourseLessonsCompleted && !surveyStatus.postCompleted && !userCertificates.includes('logicaGuanabara');
+
+  const totalCoursePoints = useMemo(
+    () => videoLessonMissions.reduce((acc, m) => acc + m.points, 0),
+    [videoLessonMissions],
+  );
+
+  const courseCompletedAtIso = useMemo(() => {
+    const dates = videoLessonMissions
+      .map((m) => m.completedAt)
+      .filter((d): d is string => Boolean(d))
+      .map((d) => new Date(d).getTime())
+      .filter((t) => !Number.isNaN(t));
+
+    if (dates.length > 0) {
+      return new Date(Math.max(...dates)).toISOString();
+    }
+
+    if (typeof window !== 'undefined' && allCourseLessonsCompleted) {
+      const storageKey = `fq_course_completed_at_${user?.id || 'guest'}`;
+      const saved = localStorage.getItem(storageKey);
+      if (saved) return saved;
+      const nowIso = new Date().toISOString();
+      try {
+        localStorage.setItem(storageKey, nowIso);
+      } catch {
+        // ignore storage errors
+      }
+      return nowIso;
+    }
+
+    return new Date().toISOString();
+  }, [videoLessonMissions, allCourseLessonsCompleted, user?.id]);
+
+  const certificateSeenKey = `fq_course_certificate_seen_${user?.id || 'guest'}`;
+
+  const openCertificateAndMarkSeen = useCallback(() => {
+    try {
+      localStorage.setItem(certificateSeenKey, 'true');
+    } catch {
+      // ignore storage errors
+    }
+    setShowCertificate(true);
+  }, [certificateSeenKey]);
 
   return (
     <div
@@ -292,7 +459,75 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
         )}
 
         {!loading && !error && missions.length > 0 && (
-          <div className="quest-list">
+          <>
+            {videoLessonMissions.length > 0 && (
+              <div
+                className={`certificate-banner ${
+                  hasAnyCertificate || needsPostSurveyForCertificate
+                    ? 'certificate-banner-unlocked'
+                    : 'certificate-banner-locked'
+                }`}
+              >
+                <div className="certificate-banner-info">
+                  <span className="certificate-banner-icon">
+                    {hasAnyCertificate
+                      ? '🏆'
+                      : needsPostSurveyForCertificate
+                        ? '📋'
+                        : !surveyStatus.preCompleted && surveyStatus.loaded
+                          ? '📝'
+                          : '🔒'}
+                  </span>
+                  <div>
+                    <p className="certificate-banner-title">
+                      {hasAnyCertificate
+                        ? `CERTIFICADOS DISPONÍVEIS (${userCertificates.length})`
+                        : needsPostSurveyForCertificate
+                          ? 'ÚLTIMO PASSO: AVALIAÇÃO FINAL!'
+                          : !surveyStatus.preCompleted && surveyStatus.loaded
+                            ? 'ETAPA 1: CADASTRO INICIAL DA OFICINA'
+                            : 'CERTIFICADO DE CONCLUSÃO (10H)'}
+                    </p>
+                    <p className="certificate-banner-sub">
+                      {hasAnyCertificate
+                        ? `Certificados conquistados: ${userCertificates.join(', ')}. Clique para visualizar e baixar em PDF.`
+                        : needsPostSurveyForCertificate
+                          ? 'Você concluiu as 15 aulas! Preencha a avaliação pós-curso para liberar seu certificado em PDF.'
+                          : !surveyStatus.preCompleted && surveyStatus.loaded
+                            ? 'Preencha o formulário inicial de perfil e diagnóstico antes de iniciar as 15 aulas.'
+                            : `Complete todas as ${totalCourseLessons} aulas (${completedVideoLessonsCount}/${totalCourseLessons}) e a avaliação final para liberar seu certificado.`}
+                    </p>
+                  </div>
+                </div>
+                {needsPostSurveyForCertificate ? (
+                  <button
+                    type="button"
+                    onClick={() => setSurveyModalMode('post')}
+                    className="certificate-banner-btn"
+                  >
+                    📋 RESPONDER E LIBERAR
+                  </button>
+                ) : !surveyStatus.preCompleted && surveyStatus.loaded ? (
+                  <button
+                    type="button"
+                    onClick={() => setSurveyModalMode('pre')}
+                    className="certificate-banner-btn"
+                  >
+                    📝 FORMULÁRIO INICIAL
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={openCertificateAndMarkSeen}
+                    className="certificate-banner-btn"
+                  >
+                    📜 CERTIFICADOS
+                  </button>
+                )}
+              </div>
+            )}
+
+            <div className="quest-list">
             {missions.map((mission, index) => {
               const config = FREQUENCY_CONFIG[mission.frequency];
               const missionNumber = String(index + 1).padStart(2, '0');
@@ -362,21 +597,40 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
                           )}
                         </button>
                       ) : (
-                        <div className="quest-completed-badge">
-                          <span className="quest-completed-icon">✓</span>
-                          <span>CONCLUIDA</span>
-                          {hasCountdown && (
-                            <div className="quest-countdown">
-                              <span className="quest-countdown-icon">⏳</span>
-                              <span className="quest-countdown-value">
-                                {String(Math.floor(Math.max(0, countdown) / 60000)).padStart(2, '0')}:{String(Math.floor((Math.max(0, countdown) % 60000) / 1000)).padStart(2, '0')}
+                        <div className="quest-completed-row">
+                          <div className="quest-completed-badge">
+                            <span className="quest-completed-icon">✓</span>
+                            <span>CONCLUIDA</span>
+                            {hasCountdown && (
+                              <div className="quest-countdown">
+                                <span className="quest-countdown-icon">⏳</span>
+                                <span className="quest-countdown-value">
+                                  {String(Math.floor(Math.max(0, countdown) / 60000)).padStart(2, '0')}:{String(Math.floor((Math.max(0, countdown) % 60000) / 1000)).padStart(2, '0')}
+                                </span>
+                              </div>
+                            )}
+                            {!hasCountdown && mission.frequency !== 'ONCE' && (
+                              <span className="quest-next-reset">
+                                {mission.nextReset.label}
                               </span>
-                            </div>
-                          )}
-                          {!hasCountdown && mission.frequency !== 'ONCE' && (
-                            <span className="quest-next-reset">
-                              {mission.nextReset.label}
-                            </span>
+                            )}
+                          </div>
+                          {mission.challengeType === 'VIDEO_LESSON' && (
+                            <button
+                              onClick={() =>
+                                setActiveChallenge({
+                                  missionId: mission.id,
+                                  challengeType: mission.challengeType,
+                                  title: mission.title,
+                                  points: mission.points,
+                                  isCompleted: true,
+                                })
+                              }
+                              className="quest-btn quest-btn-review"
+                            >
+                              <span className="quest-btn-icon">📺</span>
+                              REVER
+                            </button>
                           )}
                         </div>
                       )}
@@ -390,7 +644,8 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
                 </div>
               );
             })}
-          </div>
+            </div>
+          </>
         )}
       </div>
 
@@ -401,17 +656,37 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
 
       {activeChallenge && (
         <ChallengeRouter
+          key={activeChallenge.missionId}
           challengeType={activeChallenge.challengeType}
           missionId={activeChallenge.missionId}
           missionTitle={activeChallenge.title}
           points={activeChallenge.points}
+          isCompleted={activeChallenge.isCompleted}
           onSuccess={() => {
             const challenge = activeChallenge;
+            if (challenge.isCompleted) {
+              setActiveChallenge(null);
+              return;
+            }
             setActiveChallenge(null);
-            completeMission(challenge.missionId).then(() => {
-              fetchMissions();
-              onMissionComplete?.();
-            });
+            completeMission(challenge.missionId)
+              .then(() => {
+                setMissions((prev) =>
+                  prev.map((m) =>
+                    m.id === challenge.missionId
+                      ? { ...m, isCompleted: true, completedAt: new Date().toISOString() }
+                      : m,
+                  ),
+                );
+                setVictoryData({ points: challenge.points, missionTitle: challenge.title });
+                fetchMissions();
+                onMissionComplete?.();
+                setTimeout(() => {
+                  fetchMissions();
+                  onMissionComplete?.();
+                }, 1000);
+              })
+              .catch(() => setError('Erro ao completar missão'));
           }}
           onClose={() => setActiveChallenge(null)}
         />
@@ -421,9 +696,74 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
         <VictoryAnimation
           points={victoryData.points}
           missionTitle={victoryData.missionTitle}
-          onComplete={() => setVictoryData(null)}
+          onComplete={() => {
+            setVictoryData(null);
+            if (allCourseLessonsCompleted && !surveyStatus.postCompleted) {
+              setSurveyModalMode('post');
+            } else if (allCourseLessonsCompleted && surveyStatus.postCompleted) {
+              try {
+                if (localStorage.getItem(certificateSeenKey) !== 'true') {
+                  openCertificateAndMarkSeen();
+                }
+              } catch {
+                openCertificateAndMarkSeen();
+              }
+            }
+          }}
         />
       )}
+
+      {surveyModalMode && (
+        <ExtensionSurveyModal
+          mode={surveyModalMode}
+          studentName={user?.name || 'Aventureiro'}
+          onPreCompleted={(res) => {
+            setSurveyStatus({
+              loaded: true,
+              preCompleted: res.preCompleted,
+              postCompleted: res.postCompleted,
+            });
+            setSurveyModalMode(null);
+            const pending = pendingChallengeAfterPreRef.current;
+            pendingChallengeAfterPreRef.current = null;
+            if (pending) {
+              setActiveChallenge(pending);
+            }
+          }}
+          onPostCompleted={(res) => {
+            setSurveyStatus({
+              loaded: true,
+              preCompleted: res.preCompleted,
+              postCompleted: res.postCompleted,
+            });
+            if (user && res.certificados) {
+              setUser({ ...user, certificados: res.certificados });
+            }
+            onMissionComplete?.();
+            setSurveyModalMode(null);
+            openCertificateAndMarkSeen();
+          }}
+          onClose={() => {
+            pendingChallengeAfterPreRef.current = null;
+            setSurveyModalMode(null);
+          }}
+        />
+      )}
+
+      {showCertificate && (
+        <CourseCertificateModal
+          studentName={user?.name || 'Aventureiro'}
+          studentEmail={user?.email}
+          userId={user?.id}
+          certificates={userCertificates}
+          completedLessonsCount={completedVideoLessonsCount}
+          totalLessonsCount={totalCourseLessons}
+          totalCoursePoints={totalCoursePoints}
+          completedAtIso={courseCompletedAtIso}
+          onClose={() => setShowCertificate(false)}
+        />
+      )}
+
       <audio ref={victorySfxRef} src="/4. Ballad of Ashenwood.mp3" preload="auto" />
 
       <style jsx>{`
@@ -626,6 +966,81 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
           opacity: 0.7;
         }
 
+        .certificate-banner {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+          flex-wrap: wrap;
+          padding: 0.9rem 1rem;
+          margin-bottom: 1rem;
+          border: 2px solid var(--gold-dark);
+          background: rgba(13, 10, 21, 0.75);
+        }
+
+        .certificate-banner-unlocked {
+          border-color: var(--gold-bright);
+          background: linear-gradient(
+            135deg,
+            rgba(201, 168, 76, 0.22) 0%,
+            rgba(42, 90, 32, 0.25) 100%
+          );
+          box-shadow: 0 0 20px rgba(232, 200, 120, 0.22);
+        }
+
+        .certificate-banner-locked {
+          opacity: 0.85;
+        }
+
+        .certificate-banner-info {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          flex: 1;
+          min-width: 220px;
+        }
+
+        .certificate-banner-icon {
+          font-size: 1.5rem;
+          flex-shrink: 0;
+        }
+
+        .certificate-banner-title {
+          font-family: 'Press Start 2P', monospace;
+          font-size: 0.58rem;
+          color: var(--gold-bright);
+          margin: 0 0 0.35rem 0;
+          line-height: 1.5;
+        }
+
+        .certificate-banner-sub {
+          font-family: 'Press Start 2P', monospace;
+          font-size: 0.44rem;
+          color: var(--text-dim);
+          margin: 0;
+          line-height: 1.7;
+        }
+
+        .certificate-banner-btn {
+          font-family: 'Press Start 2P', monospace;
+          font-size: 0.5rem;
+          background: linear-gradient(180deg, #d9a738 0%, #8f6415 100%);
+          color: #161005;
+          border: 2px solid #fff0b5;
+          padding: 0.65rem 1rem;
+          cursor: pointer;
+          box-shadow: 3px 3px 0 var(--parchment-dark);
+          transition: all 0.15s;
+          white-space: nowrap;
+        }
+
+        .certificate-banner-btn:hover {
+          background: linear-gradient(180deg, #f3c85c 0%, #b37d1b 100%);
+          box-shadow:
+            3px 3px 0 var(--parchment-dark),
+            0 0 16px rgba(243, 200, 92, 0.55);
+        }
+
         .quest-list {
           display: flex;
           flex-direction: column;
@@ -811,6 +1226,21 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
 
         .quest-btn-icon {
           font-size: 0.7rem;
+        }
+
+        .quest-completed-row {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+        }
+
+        .quest-btn-review {
+          background: linear-gradient(180deg, var(--btn-blue) 0%, #10253a 100%);
+        }
+
+        .quest-btn-review:hover:not(:disabled) {
+          background: linear-gradient(180deg, var(--btn-blue-hover) 0%, #1a3a5a 100%);
         }
 
         .quest-completed-badge {

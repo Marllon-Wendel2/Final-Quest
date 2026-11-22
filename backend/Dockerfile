@@ -14,7 +14,7 @@ FROM base AS development
 
 RUN npx prisma generate
 
-CMD ["npm", "run", "start:dev"]
+CMD ["sh", "-c", "npx prisma generate && npm run start:dev"]
 
 FROM base AS production
 

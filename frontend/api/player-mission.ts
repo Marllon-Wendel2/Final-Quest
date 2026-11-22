@@ -23,7 +23,7 @@ export interface AvailableMission {
   frequency: 'MINUTE' | 'HOUR' | 'DAILY' | 'WEEKLY' | 'ONCE';
   maxCompletions: number | null;
   createdAt: string;
-  challengeType: 'NONE' | 'MEMORY' | 'TIC_TAC_TOE';  // ← NOVO
+  challengeType: 'NONE' | 'MEMORY' | 'TIC_TAC_TOE' | 'VIDEO_LESSON';
 
   isCompleted: boolean;
   completedAt: string | null;

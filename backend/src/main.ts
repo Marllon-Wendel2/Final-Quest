@@ -9,21 +9,34 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:3003',
+    'https://trippant-samira-shiny.ngrok-free.dev',
+    'https://final-quest.vercel.app',
+    'https://final-quest-git-cd-deploy-marllon-wendel2s-projects.vercel.app',
+    'http://marllon-desktop:3001',
+  ];
+
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'https://trippant-samira-shiny.ngrok-free.dev',
-      'https://final-quest.vercel.app',
-      'https://final-quest-git-cd-deploy-marllon-wendel2s-projects.vercel.app',
-      'http://marllon-desktop:3001',
-    ],
+    origin: (origin, callback) => {
+      // Permite requests sem origin (ex: Postman, mobile apps, SSR)
+      if (!origin) return callback(null, true);
+      // Em desenvolvimento, aceita qualquer localhost independente da porta
+      if (process.env.NODE_ENV !== 'production' && /^https?:\/\/localhost(:\d+)?$/.test(origin)) {
+        return callback(null, true);
+      }
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error(`CORS bloqueado para origin: ${origin}`));
+    },
     allowedHeaders: [
       'Content-Type',
       'Authorization',
       'Access-Control-Allow-Origin',
     ],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE, OPTIONS',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
 
