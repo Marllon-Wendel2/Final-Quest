@@ -24,6 +24,7 @@ export interface AvailableMission {
   maxCompletions: number | null;
   createdAt: string;
   challengeType: 'NONE' | 'MEMORY' | 'TIC_TAC_TOE' | 'VIDEO_LESSON';
+  isActive?: boolean;
 
   isCompleted: boolean;
   completedAt: string | null;
