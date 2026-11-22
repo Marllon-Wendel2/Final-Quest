@@ -10,6 +10,7 @@ export const CreateMissionSchema = z.object({
 
   frequency: FrequencyEnum.default('ONCE'),
   resetWindow: z.string().optional(),
+  isActive: z.boolean().optional(),
 });
 
 export type CreateMissionDto = z.infer<typeof CreateMissionSchema>;

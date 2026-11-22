@@ -68,6 +68,7 @@ model Mission {
   missionType    MissionType     @default(COLLECTION) @map("mission_type")
   requirements   Json            @default("{}") @map("requirements")
   prerequisites  Json?           @default("{}") @map("prerequisites")
+  isActive       Boolean         @default(true) @map("is_active")
   players        PlayerMission[]
 
   @@map("missions")

@@ -143,6 +143,7 @@ export class MissionSeedService implements OnModuleInit {
           points: lesson.points,
           frequency: 'ONCE',
           challengeType: 'VIDEO_LESSON' as any,
+          isActive: true,
         },
       });
 
