@@ -47,6 +47,10 @@ services:
       PORT: 3000
       JWT_SECRET: ${JWT_SECRET}
       REDIS_URL: redis://redis:6379
+      USER_ADM: ${USER_ADM}
+      EMAIL_ADM: ${EMAIL_ADM}
+      PASSWORD_ADM: ${PASSWORD_ADM}
+    command: sh -c "npx prisma generate && npm run start:dev"
     depends_on:
       postgres:
         condition: service_healthy
@@ -54,6 +58,7 @@ services:
         condition: service_healthy
     volumes:
       - ./backend/src:/app/src
+      - ./backend/prisma:/app/prisma
     develop:
       watch:
         - action: sync+restart
@@ -79,6 +84,7 @@ services:
       - ./frontend/api:/app/api
       - ./frontend/hooks:/app/hooks
       - ./frontend/public:/app/public
+      - ./frontend/types:/app/types
     develop:
       watch:
         - action: sync+restart
