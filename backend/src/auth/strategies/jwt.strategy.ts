@@ -40,6 +40,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       name: user.name,
       role: user.role,
       points: user.points,
+      certificados: (user as { certificados?: string[] }).certificados ?? [],
     };
   }
 }
