@@ -16,7 +16,9 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  role?: 'USER' | 'ADMIN';
   points: number;
+  certificados?: string[];
 }
 
 export async function getMe(): Promise<User | null> {

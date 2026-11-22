@@ -6,6 +6,8 @@ import AuthForm from './components/AuthForm';
 import MissionsList from './components/MissionsList';
 import RankingList from './components/RankingList';
 import ServerWakeUpBanner from './components/ServerWakeUpBanner';
+import CourseCertificateModal from './components/minigames/VideoLesson/CourseCertificateModal';
+import ExtensionReportModal from './components/minigames/VideoLesson/ExtensionReportModal';
 import { useAuth } from './contexts/AuthContext';
 import { getMe, User } from '../api/client';
 import './globals.css';
@@ -14,6 +16,8 @@ export default function Home() {
   const { user, setUser, loading, logout: authLogout } = useAuth();
   const [pointsAnimating, setPointsAnimating] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [showCertificatesModal, setShowCertificatesModal] = useState(false);
+  const [showExtensionReportModal, setShowExtensionReportModal] = useState(false);
   const prevPointsRef = useRef<number | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -176,7 +180,49 @@ export default function Home() {
               Olá, Sir. {user.name}
             </span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            {user.role === 'ADMIN' && (
+              <button
+                type="button"
+                onClick={() => setShowExtensionReportModal(true)}
+                className="rpg-badge header-badge"
+                style={{
+                  cursor: 'pointer',
+                  background: 'rgba(26, 58, 90, 0.9)',
+                  color: 'var(--gold-bright)',
+                  border: '2px solid var(--gold)',
+                }}
+              >
+                📊 Relatório Extensão
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                getMe().then((fresh) => {
+                  if (fresh) setUser(fresh);
+                  setShowCertificatesModal(true);
+                });
+              }}
+              className="rpg-badge header-badge"
+              style={{
+                cursor: 'pointer',
+                background:
+                  user.certificados && user.certificados.length > 0
+                    ? 'linear-gradient(180deg, #d9a738 0%, #8f6415 100%)'
+                    : 'rgba(26, 42, 26, 0.85)',
+                color:
+                  user.certificados && user.certificados.length > 0
+                    ? '#161005'
+                    : 'var(--gold-bright)',
+                border: '2px solid var(--gold)',
+              }}
+            >
+              📜 Certificados
+              {user.certificados && user.certificados.length > 0
+                ? ` (${user.certificados.length})`
+                : ''}
+            </button>
             <span className={`rpg-badge header-badge ${pointsAnimating ? 'header-points-pop' : ''}`}>{user.points} pts</span>
             <button onClick={handleLogout} className="rpg-logout-btn header-logout">
               Sair
@@ -185,6 +231,20 @@ export default function Home() {
         </header>
 
         <MissionsList onMissionComplete={() => getMe().then(setUser)} bgAudioRef={audioRef} />
+
+        {showCertificatesModal && (
+          <CourseCertificateModal
+            studentName={user.name}
+            studentEmail={user.email}
+            userId={user.id}
+            certificates={user.certificados ?? []}
+            onClose={() => setShowCertificatesModal(false)}
+          />
+        )}
+
+        {showExtensionReportModal && (
+          <ExtensionReportModal onClose={() => setShowExtensionReportModal(false)} />
+        )}
 
         <div style={{ marginTop: '2rem' }}>
           <RankingList />
