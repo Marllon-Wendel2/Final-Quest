@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/unbound-method, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MissionProcessorService } from './mission.processor';
 import { createPrismaMock, PrismaMock } from '../test/prisma.mock';
@@ -49,6 +53,17 @@ describe('MissionProcessorService', () => {
       await expect(
         processor.processCompletion('user-1', 'nonexistent'),
       ).rejects.toThrow(NotFoundException);
+    });
+
+    it('deve lançar BadRequestException para missão desabilitada', async () => {
+      prisma.mission.findUnique.mockResolvedValue(
+        makeMission({ isActive: false }),
+      );
+
+      await expect(
+        processor.processCompletion('user-1', 'mission-1'),
+      ).rejects.toThrow(BadRequestException);
+      expect(prisma.$transaction).not.toHaveBeenCalled();
     });
 
     it('deve lançar ConflictException para missão ONCE já completada (limite atingido)', async () => {

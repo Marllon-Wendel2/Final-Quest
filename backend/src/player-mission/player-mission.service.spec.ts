@@ -1,4 +1,8 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerMissionService } from './player-mission.service';
 import { createPrismaMock, PrismaMock } from '../test/prisma.mock';
@@ -60,6 +64,16 @@ describe('PlayerMissionService', () => {
       ).rejects.toThrow(NotFoundException);
     });
 
+    it('deve lançar BadRequestException se missão estiver desabilitada', async () => {
+      const mission = makeMission({ isActive: false });
+      prisma.mission.findUnique.mockResolvedValue(mission);
+
+      await expect(
+        service.completeMission('user-id', mission.id),
+      ).rejects.toThrow(BadRequestException);
+      expect(missionQueue.addCompletion).not.toHaveBeenCalled();
+    });
+
     it('deve lançar ConflictException se missão ONCE já completada (limite atingido)', async () => {
       const mission = makeMission({ frequency: 'ONCE', maxCompletions: 1 });
 
@@ -100,6 +114,28 @@ describe('PlayerMissionService', () => {
         message: 'Missão em processamento',
       });
       expect(missionQueue.addCompletion).toHaveBeenCalled();
+    });
+  });
+
+  describe('getAvailableMissions', () => {
+    it('deve buscar apenas missões ativas (isActive: true)', async () => {
+      const activeMission = makeMission({
+        id: 'lesson-1',
+        title: 'Aula 1: Introdução à Lógica',
+        challengeType: 'VIDEO_LESSON',
+        isActive: true,
+      });
+      prisma.mission.findMany.mockResolvedValue([activeMission]);
+      prisma.playerMission.count.mockResolvedValue(0);
+
+      const result = await service.getAvailableMissions('user-id-001');
+
+      expect(prisma.mission.findMany).toHaveBeenCalledWith({
+        where: { isActive: true },
+        orderBy: { createdAt: 'asc' },
+      });
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('lesson-1');
     });
   });
 

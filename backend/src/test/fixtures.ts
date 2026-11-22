@@ -28,6 +28,7 @@ export function makeMission(overrides?: Partial<Mission>): Mission {
     missionType: 'COLLECTION',
     requirements: {},
     prerequisites: {},
+    isActive: true,
     ...overrides,
   };
 }

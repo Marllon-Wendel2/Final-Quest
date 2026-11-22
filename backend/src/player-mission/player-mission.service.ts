@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -23,6 +24,10 @@ export class PlayerMissionService {
 
     if (!mission) {
       throw new NotFoundException('Missão não encontrada');
+    }
+
+    if (!mission.isActive) {
+      throw new BadRequestException('Missão desabilitada');
     }
 
     // Validação rápida de negócio (fail fast antes de enfileirar)
@@ -50,6 +55,7 @@ export class PlayerMissionService {
 
   async getAvailableMissions(userId: string) {
     const missions = await this.prismaService.mission.findMany({
+      where: { isActive: true },
       orderBy: { createdAt: 'asc' },
     });
 

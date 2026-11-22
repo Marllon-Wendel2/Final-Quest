@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   Logger,
@@ -25,6 +26,10 @@ export class MissionProcessorService {
 
     if (!mission) {
       throw new NotFoundException('Missão não encontrada');
+    }
+
+    if (!mission.isActive) {
+      throw new BadRequestException('Missão desabilitada');
     }
 
     let resetWindow = getResetWindow(mission.frequency);

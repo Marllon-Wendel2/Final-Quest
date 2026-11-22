@@ -4,9 +4,10 @@ type TransactionClient = {
 };
 
 export type PrismaMock = {
-  mission: { findUnique: jest.Mock };
+  mission: { findUnique: jest.Mock; findMany: jest.Mock };
   playerMission: {
     findUnique: jest.Mock;
+    findFirst: jest.Mock;
     findMany: jest.Mock;
     count: jest.Mock;
     create: jest.Mock;
@@ -34,9 +35,11 @@ export function createPrismaMock(): PrismaMock {
   return {
     mission: {
       findUnique: jest.fn(),
+      findMany: jest.fn(),
     },
     playerMission: {
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
       findMany: jest.fn(),
       count: jest.fn(),
       create: jest.fn(),
