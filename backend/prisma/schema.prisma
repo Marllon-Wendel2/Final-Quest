@@ -16,11 +16,12 @@ model User {
   createdAt    DateTime        @default(now()) @map("created_at")
   updatedAt    DateTime        @updatedAt @map("updated_at")
   role         Role            @default(USER)
-  gameEvents   GameEvent[]
-  gameSave         GameSave?
-  missions         PlayerMission[]
-  save             Save?
-  extensionSurveys ExtensionSurvey[]
+  gameEvents          GameEvent[]
+  gameSave            GameSave?
+  missions            PlayerMission[]
+  save                Save?
+  extensionSurveys    ExtensionSurvey[]
+  videoLessonProgress VideoLessonProgress[]
 
   @@map("users")
 }
@@ -68,10 +69,29 @@ model Mission {
   missionType    MissionType     @default(COLLECTION) @map("mission_type")
   requirements   Json            @default("{}") @map("requirements")
   prerequisites  Json?           @default("{}") @map("prerequisites")
-  isActive       Boolean         @default(true) @map("is_active")
-  players        PlayerMission[]
+  isActive            Boolean               @default(true) @map("is_active")
+  players             PlayerMission[]
+  videoLessonProgress VideoLessonProgress[]
 
   @@map("missions")
+}
+
+model VideoLessonProgress {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String   @map("user_id") @db.Uuid
+  missionId         String   @map("mission_id") @db.Uuid
+  answeredQuestions String[] @default([]) @map("answered_questions")
+  xpGranted         String[] @default([]) @map("xp_granted")
+  bonusGranted      Boolean  @default(false) @map("bonus_granted")
+  videoCompleted    Boolean  @default(false) @map("video_completed")
+  missionCompleted  Boolean  @default(false) @map("mission_completed")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mission           Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, missionId])
+  @@map("video_lesson_progress")
 }
 
 model PlayerMission {
