@@ -3,6 +3,11 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import styles from './VideoLesson.module.css';
 import { findLessonConfig, LessonQuestion } from './lessons.config';
+import {
+  getVideoLessonProgress,
+  saveVideoLessonProgress,
+  VideoLessonProgress,
+} from '../../../../api/player-mission';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -11,62 +16,40 @@ interface VideoLessonProps {
   missionTitle: string;
   points: number;
   isCompleted?: boolean;
+  initialLessonProgress?: VideoLessonProgress;
+  onLessonProgressChange?: (progress: VideoLessonProgress) => void;
   onSuccess: () => void;
   onClose: () => void;
-}
-
-interface LessonProgress {
-  answeredQuestions: string[];
-  xpGranted: string[];
-  bonusGranted: boolean;
-  videoCompleted: boolean;
-  missionCompleted: boolean;
 }
 
 type Phase = 'watching' | 'question' | 'completed';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-function storageKey(missionId: string) {
-  return `fq_lesson_${missionId}_progress`;
-}
+const EMPTY_PROGRESS: VideoLessonProgress = {
+  answeredQuestions: [],
+  xpGranted: [],
+  bonusGranted: false,
+  videoCompleted: false,
+  missionCompleted: false,
+};
 
-function legacyLesson1StorageKey(missionId: string) {
-  return `fq_lesson1_${missionId}_progress`;
-}
-
-function loadProgress(missionId: string, lessonNumber: number): LessonProgress {
-  const defaultProgress: LessonProgress = {
-    answeredQuestions: [],
-    xpGranted: [],
-    bonusGranted: false,
-    videoCompleted: false,
-    missionCompleted: false,
+function mergeProgress(
+  base: VideoLessonProgress,
+  incoming?: Partial<VideoLessonProgress>,
+): VideoLessonProgress {
+  if (!incoming) return { ...base };
+  return {
+    answeredQuestions: Array.from(
+      new Set([...base.answeredQuestions, ...(incoming.answeredQuestions ?? [])]),
+    ),
+    xpGranted: Array.from(
+      new Set([...base.xpGranted, ...(incoming.xpGranted ?? [])]),
+    ),
+    bonusGranted: Boolean(base.bonusGranted || incoming.bonusGranted),
+    videoCompleted: Boolean(base.videoCompleted || incoming.videoCompleted),
+    missionCompleted: Boolean(base.missionCompleted || incoming.missionCompleted),
   };
-
-  try {
-    const raw =
-      localStorage.getItem(storageKey(missionId)) ??
-      (lessonNumber === 1
-        ? localStorage.getItem(legacyLesson1StorageKey(missionId))
-        : null);
-
-    if (raw) {
-      return { ...defaultProgress, ...(JSON.parse(raw) as Partial<LessonProgress>) };
-    }
-  } catch {
-    // ignore storage errors
-  }
-
-  return defaultProgress;
-}
-
-function saveProgress(missionId: string, progress: LessonProgress) {
-  try {
-    localStorage.setItem(storageKey(missionId), JSON.stringify(progress));
-  } catch {
-    // ignore storage errors
-  }
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
@@ -76,6 +59,8 @@ export default function VideoLesson({
   missionTitle,
   points,
   isCompleted = false,
+  initialLessonProgress,
+  onLessonProgressChange,
   onSuccess,
   onClose,
 }: VideoLessonProps) {
@@ -84,8 +69,14 @@ export default function VideoLesson({
   const playerContainerId = `yt-player-video-lesson-${lessonNumber}`;
 
   const initialSaved = useMemo(
-    () => loadProgress(missionId, lessonNumber),
-    [missionId, lessonNumber],
+    () =>
+      mergeProgress(EMPTY_PROGRESS, {
+        ...initialLessonProgress,
+        missionCompleted: Boolean(
+          initialLessonProgress?.missionCompleted || isCompleted,
+        ),
+      }),
+    [initialLessonProgress, isCompleted],
   );
   const initialAlreadyDone = isCompleted || initialSaved.missionCompleted;
   const initialPhase: Phase =
@@ -114,17 +105,22 @@ export default function VideoLesson({
   const playerRef = useRef<YTPlayer | null>(null);
   const playerHostRef = useRef<HTMLDivElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const progressRef = useRef<LessonProgress>(initialSaved);
+  const progressRef = useRef<VideoLessonProgress>(initialSaved);
   const videoCompletedRef = useRef(initialSaved.videoCompleted);
   const pendingQuestionsRef = useRef<string[]>([]);
   const answeredCorrectlyRef = useRef<Set<string>>(new Set(initialSaved.answeredQuestions));
   const phaseRef = useRef<Phase>(initialPhase);
   const missionAlreadyCompletedRef = useRef(initialAlreadyDone);
   const onSuccessRef = useRef(onSuccess);
+  const onLessonProgressChangeRef = useRef(onLessonProgressChange);
 
   useEffect(() => {
     onSuccessRef.current = onSuccess;
   }, [onSuccess]);
+
+  useEffect(() => {
+    onLessonProgressChangeRef.current = onLessonProgressChange;
+  }, [onLessonProgressChange]);
 
   // ── Keep refs in sync with state ──
   const updatePhase = useCallback((p: Phase) => {
@@ -137,22 +133,76 @@ export default function VideoLesson({
     setAnsweredCorrectly(s);
   }, []);
 
-  // ── Grant question XP once ──
-  const grantQuestionXP = useCallback(
-    (questionId: string) => {
-      const prog = progressRef.current;
-      if (prog.xpGranted.includes(questionId)) return;
-      prog.xpGranted = [...prog.xpGranted, questionId];
-      progressRef.current = prog;
-      saveProgress(missionId, prog);
-      setXpEarned((prev) => prev + xpPerQuestion);
+  const persistProgress = useCallback(
+    (next: VideoLessonProgress) => {
+      const snapshot: VideoLessonProgress = {
+        answeredQuestions: [...next.answeredQuestions],
+        xpGranted: [...next.xpGranted],
+        bonusGranted: next.bonusGranted,
+        videoCompleted: next.videoCompleted,
+        missionCompleted: next.missionCompleted,
+      };
+      progressRef.current = snapshot;
+      onLessonProgressChangeRef.current?.(snapshot);
+      saveVideoLessonProgress(missionId, snapshot).catch(() => {
+        // ignore transient network errors; next update will resync monotonically
+      });
     },
-    [missionId, xpPerQuestion],
+    [missionId],
   );
+
+  // ── Sync latest progress from backend on mount ──
+  useEffect(() => {
+    let active = true;
+    getVideoLessonProgress(missionId)
+      .then((remote) => {
+        if (!active) return;
+        const merged = mergeProgress(progressRef.current, {
+          ...remote,
+          missionCompleted: Boolean(remote.missionCompleted || isCompleted),
+        });
+        progressRef.current = merged;
+        videoCompletedRef.current = merged.videoCompleted;
+        const answeredSet = new Set(merged.answeredQuestions);
+        updateAnsweredCorrectly(answeredSet);
+        setXpEarned(
+          merged.xpGranted.length * xpPerQuestion +
+            (merged.bonusGranted ? xpBonus : 0),
+        );
+        if (merged.missionCompleted) {
+          missionAlreadyCompletedRef.current = true;
+          setMissionAlreadyCompleted(true);
+        }
+        if (
+          merged.missionCompleted &&
+          merged.videoCompleted &&
+          merged.answeredQuestions.length >= questions.length &&
+          phaseRef.current === 'watching'
+        ) {
+          updatePhase('completed');
+        }
+        onLessonProgressChangeRef.current?.(merged);
+      })
+      .catch(() => {
+        // fallback to initialLessonProgress already loaded
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [
+    missionId,
+    isCompleted,
+    xpPerQuestion,
+    xpBonus,
+    questions.length,
+    updateAnsweredCorrectly,
+    updatePhase,
+  ]);
 
   // ── Complete lesson (only trigger backend completion once) ──
   const finalizeLesson = useCallback(() => {
-    const prog = progressRef.current;
+    const prog = { ...progressRef.current };
 
     if (!prog.bonusGranted) {
       prog.bonusGranted = true;
@@ -161,8 +211,7 @@ export default function VideoLesson({
 
     const shouldNotifyBackend = !missionAlreadyCompletedRef.current && !prog.missionCompleted;
     prog.missionCompleted = true;
-    progressRef.current = prog;
-    saveProgress(missionId, prog);
+    persistProgress(prog);
 
     updatePhase('completed');
 
@@ -171,7 +220,7 @@ export default function VideoLesson({
       setMissionAlreadyCompleted(true);
       onSuccessRef.current();
     }
-  }, [missionId, xpBonus, updatePhase]);
+  }, [xpBonus, persistProgress, updatePhase]);
 
   // ── Handle answer ──
   const handleAnswer = useCallback(
@@ -185,16 +234,26 @@ export default function VideoLesson({
 
       if (isCorrect) {
         setShowFeedback({ correct: true, text: question.feedback.right });
-        grantQuestionXP(question.id);
+
+        const prog = { ...progressRef.current };
+        let changed = false;
+
+        if (!prog.xpGranted.includes(question.id)) {
+          prog.xpGranted = [...prog.xpGranted, question.id];
+          setXpEarned((prev) => prev + xpPerQuestion);
+          changed = true;
+        }
 
         const newAnswered = new Set([...answeredCorrectlyRef.current, question.id]);
         updateAnsweredCorrectly(newAnswered);
 
-        const prog = progressRef.current;
         if (!prog.answeredQuestions.includes(question.id)) {
           prog.answeredQuestions = [...prog.answeredQuestions, question.id];
-          progressRef.current = prog;
-          saveProgress(missionId, prog);
+          changed = true;
+        }
+
+        if (changed) {
+          persistProgress(prog);
         }
 
         setTimeout(() => {
@@ -233,8 +292,8 @@ export default function VideoLesson({
       showFeedback,
       currentQuestionIndex,
       questions,
-      grantQuestionXP,
-      missionId,
+      xpPerQuestion,
+      persistProgress,
       updateAnsweredCorrectly,
       updatePhase,
       finalizeLesson,
@@ -284,10 +343,8 @@ export default function VideoLesson({
   // ── On video ended ──
   const handleVideoEnded = useCallback(() => {
     videoCompletedRef.current = true;
-    const prog = progressRef.current;
-    prog.videoCompleted = true;
-    progressRef.current = prog;
-    saveProgress(missionId, prog);
+    const prog = { ...progressRef.current, videoCompleted: true };
+    persistProgress(prog);
     stopPolling();
 
     const unansweredMid = questions
@@ -311,7 +368,7 @@ export default function VideoLesson({
     }
 
     finalizeLesson();
-  }, [missionId, questions, stopPolling, updatePhase, finalizeLesson]);
+  }, [questions, persistProgress, stopPolling, updatePhase, finalizeLesson]);
 
   const startPollingRef = useRef(startPolling);
   const stopPollingRef = useRef(stopPolling);

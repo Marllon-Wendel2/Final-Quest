@@ -15,6 +15,14 @@ export interface PlayerMission {
   };
 }
 
+export interface VideoLessonProgress {
+  answeredQuestions: string[];
+  xpGranted: string[];
+  bonusGranted: boolean;
+  videoCompleted: boolean;
+  missionCompleted: boolean;
+}
+
 export interface AvailableMission {
   id: string;
   title: string;
@@ -34,6 +42,7 @@ export interface AvailableMission {
     label: string;
     date: string;
   };
+  lessonProgress?: VideoLessonProgress;
 }
 
 export async function completeMission(missionId: string): Promise<PlayerMission> {
@@ -48,5 +57,20 @@ export async function getMyMissions(): Promise<PlayerMission[]> {
 
 export async function getAvailableMissions(): Promise<AvailableMission[]> {
     const { data } = await apiRequestWithRetry(() => api.get('/player-missions/available'));
+    return data;
+}
+
+export async function getVideoLessonProgress(missionId: string): Promise<VideoLessonProgress> {
+    const { data } = await apiRequestWithRetry(() => api.get(`/player-missions/lesson-progress/${missionId}`));
+    return data;
+}
+
+export async function saveVideoLessonProgress(
+    missionId: string,
+    progress: Partial<VideoLessonProgress>,
+): Promise<VideoLessonProgress> {
+    const { data } = await apiRequestWithRetry(() =>
+        api.put(`/player-missions/lesson-progress/${missionId}`, progress),
+    );
     return data;
 }

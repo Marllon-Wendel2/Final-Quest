@@ -1,7 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { AvailableMission, completeMission, getAvailableMissions } from '../../api/player-mission';
+import {
+  AvailableMission,
+  completeMission,
+  getAvailableMissions,
+  VideoLessonProgress,
+} from '../../api/player-mission';
 import VictoryAnimation from './VictoryAnimation';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -79,6 +84,7 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
     challengeType: string;
     title: string;
     points: number;
+    lessonProgress?: VideoLessonProgress;
   } | null>(null);
 
   const [activeChallenge, setActiveChallenge] = useState<{
@@ -87,6 +93,7 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
     title: string;
     points: number;
     isCompleted?: boolean;
+    lessonProgress?: VideoLessonProgress;
   } | null>(null);
 
   // Pause page background audio while a VIDEO_LESSON modal is open, and resume when closed
@@ -233,14 +240,28 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
     title: string,
     e: React.MouseEvent,
   ) => {
+    const targetMission = missions.find((m) => m.id === missionId);
+
     if (challengeType === 'VIDEO_LESSON' && surveyStatus.loaded && !surveyStatus.preCompleted) {
-      pendingChallengeAfterPreRef.current = { missionId, challengeType, title, points };
+      pendingChallengeAfterPreRef.current = {
+        missionId,
+        challengeType,
+        title,
+        points,
+        lessonProgress: targetMission?.lessonProgress,
+      };
       setSurveyModalMode('pre');
       return;
     }
 
     if (challengeType !== 'NONE') {
-      setActiveChallenge({ missionId, challengeType, title, points });
+      setActiveChallenge({
+        missionId,
+        challengeType,
+        title,
+        points,
+        lessonProgress: targetMission?.lessonProgress,
+      });
       return;
     }
 
@@ -361,21 +382,8 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
       return new Date(Math.max(...dates)).toISOString();
     }
 
-    if (typeof window !== 'undefined' && allCourseLessonsCompleted) {
-      const storageKey = `fq_course_completed_at_${user?.id || 'guest'}`;
-      const saved = localStorage.getItem(storageKey);
-      if (saved) return saved;
-      const nowIso = new Date().toISOString();
-      try {
-        localStorage.setItem(storageKey, nowIso);
-      } catch {
-        // ignore storage errors
-      }
-      return nowIso;
-    }
-
     return new Date().toISOString();
-  }, [videoLessonMissions, allCourseLessonsCompleted, user?.id]);
+  }, [videoLessonMissions]);
 
   const certificateSeenKey = `fq_course_certificate_seen_${user?.id || 'guest'}`;
 
@@ -624,6 +632,7 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
                                   title: mission.title,
                                   points: mission.points,
                                   isCompleted: true,
+                                  lessonProgress: mission.lessonProgress,
                                 })
                               }
                               className="quest-btn quest-btn-review"
@@ -662,6 +671,15 @@ export default function MissionsList({ onMissionComplete, bgAudioRef }: Missions
           missionTitle={activeChallenge.title}
           points={activeChallenge.points}
           isCompleted={activeChallenge.isCompleted}
+          initialLessonProgress={activeChallenge.lessonProgress}
+          onLessonProgressChange={(progress) => {
+            const targetId = activeChallenge.missionId;
+            setMissions((prev) =>
+              prev.map((m) =>
+                m.id === targetId ? { ...m, lessonProgress: progress } : m,
+              ),
+            );
+          }}
           onSuccess={() => {
             const challenge = activeChallenge;
             if (challenge.isCompleted) {

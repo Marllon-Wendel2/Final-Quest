@@ -5,11 +5,15 @@ import NoChallenge from './Nochallenge';
 import TicTacToe from './TicTacToe/TicTacToe';
 import MemoryGame from './MemoryGame/MemoryGame';
 import VideoLesson from './VideoLesson/VideoLesson';
+import type { VideoLessonProgress } from '../../../api/player-mission';
+
 interface ChallengeProps {
   missionId: string;
   missionTitle: string;
   points: number;
   isCompleted?: boolean;
+  initialLessonProgress?: VideoLessonProgress;
+  onLessonProgressChange?: (progress: VideoLessonProgress) => void;
   onSuccess: () => void;
   onClose: () => void;
 }
