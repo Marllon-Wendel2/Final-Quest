@@ -108,6 +108,21 @@ export class MissionProcessorService {
       );
 
       if ((mission.challengeType as string) === 'VIDEO_LESSON') {
+        try {
+          await this.prismaService.videoLessonProgress?.upsert({
+            where: { userId_missionId: { userId, missionId } },
+            create: {
+              userId,
+              missionId,
+              missionCompleted: true,
+            },
+            update: {
+              missionCompleted: true,
+            },
+          });
+        } catch {
+          // ignore if migration hasn't run yet
+        }
         await this.ensureLogicaCertificateIfComplete(userId);
       }
 

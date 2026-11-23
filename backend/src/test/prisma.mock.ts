@@ -12,6 +12,11 @@ export type PrismaMock = {
     count: jest.Mock;
     create: jest.Mock;
   };
+  videoLessonProgress: {
+    findUnique: jest.Mock;
+    findMany: jest.Mock;
+    upsert: jest.Mock;
+  };
   user: { update: jest.Mock };
   $transaction: jest.Mock;
 };
@@ -43,6 +48,11 @@ export function createPrismaMock(): PrismaMock {
       findMany: jest.fn(),
       count: jest.fn(),
       create: jest.fn(),
+    },
+    videoLessonProgress: {
+      findUnique: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
+      upsert: jest.fn(),
     },
     user: {
       update: jest.fn(),

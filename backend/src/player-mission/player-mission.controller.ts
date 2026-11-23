@@ -1,6 +1,8 @@
 import {
+  Body,
   Controller,
   Post,
+  Put,
   Get,
   Param,
   UseGuards,
@@ -16,6 +18,10 @@ import {
 } from '@nestjs/swagger';
 import { PlayerMissionService } from './player-mission.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import {
+  UpdateVideoLessonProgressPipe,
+  type UpdateVideoLessonProgressDto,
+} from './dto/video-lesson-progress.dto';
 
 @ApiTags('Player Missions')
 @ApiCookieAuth('token')
@@ -48,5 +54,33 @@ export class PlayerMissionsController {
   @ApiResponse({ status: 200, description: 'Histórico de missões' })
   async getMyMissions(@Request() req: { user: { id: string } }) {
     return this.playerMissionService.getPlayerHistory(req.user.id);
+  }
+
+  @Get('lesson-progress/:missionId')
+  @ApiOperation({ summary: 'Obter progresso salvo de uma videoaula' })
+  @ApiResponse({ status: 200, description: 'Progresso da videoaula' })
+  async getLessonProgress(
+    @Param('missionId') missionId: string,
+    @Request() req: { user: { id: string } },
+  ) {
+    return this.playerMissionService.getVideoLessonProgress(
+      req.user.id,
+      missionId,
+    );
+  }
+
+  @Put('lesson-progress/:missionId')
+  @ApiOperation({ summary: 'Salvar progresso de uma videoaula' })
+  @ApiResponse({ status: 200, description: 'Progresso atualizado' })
+  async saveLessonProgress(
+    @Param('missionId') missionId: string,
+    @Request() req: { user: { id: string } },
+    @Body(UpdateVideoLessonProgressPipe) dto: UpdateVideoLessonProgressDto,
+  ) {
+    return this.playerMissionService.saveVideoLessonProgress(
+      req.user.id,
+      missionId,
+      dto,
+    );
   }
 }

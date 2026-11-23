@@ -182,4 +182,90 @@ describe('PlayerMissionService', () => {
       expect(result).toEqual([]);
     });
   });
+
+  describe('videoLessonProgress', () => {
+    it('deve retornar progresso salvo mesclado com conclusão do PlayerMission', async () => {
+      const mission = makeMission({
+        id: 'lesson-1',
+        challengeType: 'VIDEO_LESSON',
+      });
+      prisma.mission.findUnique.mockResolvedValue(mission);
+      prisma.videoLessonProgress.findUnique.mockResolvedValue({
+        answeredQuestions: ['q1'],
+        xpGranted: ['q1'],
+        bonusGranted: false,
+        videoCompleted: false,
+        missionCompleted: false,
+      });
+      prisma.playerMission.findFirst.mockResolvedValue({ id: 'pm-1' });
+
+      const result = await service.getVideoLessonProgress(
+        'user-id-001',
+        mission.id,
+      );
+
+      expect(result).toEqual({
+        answeredQuestions: ['q1'],
+        xpGranted: ['q1'],
+        bonusGranted: false,
+        videoCompleted: false,
+        missionCompleted: true,
+      });
+    });
+
+    it('deve mesclar progresso de videoaula de forma monotônica no upsert', async () => {
+      const mission = makeMission({
+        id: 'lesson-1',
+        challengeType: 'VIDEO_LESSON',
+        isActive: true,
+      });
+      prisma.mission.findUnique.mockResolvedValue(mission);
+      prisma.videoLessonProgress.findUnique.mockResolvedValue({
+        answeredQuestions: ['q1'],
+        xpGranted: ['q1'],
+        bonusGranted: false,
+        videoCompleted: true,
+        missionCompleted: false,
+      });
+      prisma.videoLessonProgress.upsert.mockImplementation(
+        ({ create }: { create: Record<string, unknown> }) =>
+          Promise.resolve(create),
+      );
+
+      const result = await service.saveVideoLessonProgress(
+        'user-id-001',
+        mission.id,
+        {
+          answeredQuestions: ['q1', 'q2'],
+          xpGranted: ['q2'],
+          bonusGranted: true,
+          videoCompleted: false,
+          missionCompleted: true,
+        },
+      );
+
+      expect(result).toEqual({
+        answeredQuestions: ['q1', 'q2'],
+        xpGranted: ['q1', 'q2'],
+        bonusGranted: true,
+        videoCompleted: true,
+        missionCompleted: true,
+      });
+    });
+
+    it('deve rejeitar progresso para missão que não é VIDEO_LESSON', async () => {
+      const mission = makeMission({
+        id: 'other-mission',
+        challengeType: 'MEMORY',
+        isActive: true,
+      });
+      prisma.mission.findUnique.mockResolvedValue(mission);
+
+      await expect(
+        service.saveVideoLessonProgress('user-id-001', mission.id, {
+          videoCompleted: true,
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
 });

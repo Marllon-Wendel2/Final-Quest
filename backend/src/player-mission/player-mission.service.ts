@@ -8,6 +8,23 @@ import { getResetWindow } from '../mission/reset-window';
 import { MissionQueue } from '../queue/mission.queue';
 import { PrismaService } from '../prisma/prisma.service';
 import { RankingGateway } from '../ranking/ranking.gateway';
+import { UpdateVideoLessonProgressDto } from './dto/video-lesson-progress.dto';
+
+export interface VideoLessonProgressData {
+  answeredQuestions: string[];
+  xpGranted: string[];
+  bonusGranted: boolean;
+  videoCompleted: boolean;
+  missionCompleted: boolean;
+}
+
+const DEFAULT_VIDEO_LESSON_PROGRESS: VideoLessonProgressData = {
+  answeredQuestions: [],
+  xpGranted: [],
+  bonusGranted: false,
+  videoCompleted: false,
+  missionCompleted: false,
+};
 
 @Injectable()
 export class PlayerMissionService {
@@ -59,6 +76,25 @@ export class PlayerMissionService {
       orderBy: { createdAt: 'asc' },
     });
 
+    const lessonProgressByMission = new Map<string, VideoLessonProgressData>();
+    try {
+      const savedProgress =
+        (await this.prismaService.videoLessonProgress?.findMany({
+          where: { userId },
+        })) ?? [];
+      for (const p of savedProgress) {
+        lessonProgressByMission.set(p.missionId, {
+          answeredQuestions: p.answeredQuestions,
+          xpGranted: p.xpGranted,
+          bonusGranted: p.bonusGranted,
+          videoCompleted: p.videoCompleted,
+          missionCompleted: p.missionCompleted,
+        });
+      }
+    } catch {
+      // ignore if migration hasn't run yet
+    }
+
     const missionsWithStatus = await Promise.all(
       missions.map(async (mission) => {
         const resetWindow = getResetWindow(mission.frequency);
@@ -78,6 +114,18 @@ export class PlayerMissionService {
               },
             });
             isCompleted = completionsCount >= mission.maxCompletions;
+            if (completionsCount > 0) {
+              const latest = await this.prismaService.playerMission.findFirst({
+                where: {
+                  userId,
+                  missionId: mission.id,
+                  resetWindow: { startsWith: 'once-' },
+                },
+                orderBy: { completedAt: 'desc' },
+                select: { completedAt: true },
+              });
+              completedAt = latest?.completedAt ?? null;
+            }
           } else {
             // ONCE sem limite: verificar se existe qualquer completion
             const existing = await this.prismaService.playerMission.findFirst({
@@ -102,6 +150,17 @@ export class PlayerMissionService {
           completedAt = completion?.completedAt ?? null;
         }
 
+        const storedLessonProgress = lessonProgressByMission.get(mission.id);
+        const lessonProgress: VideoLessonProgressData | undefined =
+          (mission.challengeType as string) === 'VIDEO_LESSON'
+            ? {
+                ...(storedLessonProgress ?? DEFAULT_VIDEO_LESSON_PROGRESS),
+                missionCompleted: Boolean(
+                  storedLessonProgress?.missionCompleted || isCompleted,
+                ),
+              }
+            : undefined;
+
         return {
           ...mission,
           isCompleted,
@@ -109,6 +168,7 @@ export class PlayerMissionService {
           completionsCount,
           resetWindow,
           nextReset: getNextResetInfo(mission.frequency),
+          ...(lessonProgress ? { lessonProgress } : {}),
         };
       }),
     );
@@ -125,6 +185,114 @@ export class PlayerMissionService {
     }
 
     return missionsWithStatus;
+  }
+
+  async getVideoLessonProgress(
+    userId: string,
+    missionId: string,
+  ): Promise<VideoLessonProgressData> {
+    const mission = await this.prismaService.mission.findUnique({
+      where: { id: missionId },
+    });
+
+    if (!mission) {
+      throw new NotFoundException('Missão não encontrada');
+    }
+
+    if ((mission.challengeType as string) !== 'VIDEO_LESSON') {
+      throw new BadRequestException('Missão não é uma videoaula');
+    }
+
+    const [saved, existingCompletion] = await Promise.all([
+      this.prismaService.videoLessonProgress.findUnique({
+        where: { userId_missionId: { userId, missionId } },
+      }),
+      this.prismaService.playerMission.findFirst({
+        where: { userId, missionId },
+        select: { id: true },
+      }),
+    ]);
+
+    return {
+      answeredQuestions: saved?.answeredQuestions ?? [],
+      xpGranted: saved?.xpGranted ?? [],
+      bonusGranted: saved?.bonusGranted ?? false,
+      videoCompleted: saved?.videoCompleted ?? false,
+      missionCompleted: Boolean(
+        saved?.missionCompleted || existingCompletion,
+      ),
+    };
+  }
+
+  async saveVideoLessonProgress(
+    userId: string,
+    missionId: string,
+    dto: UpdateVideoLessonProgressDto,
+  ): Promise<VideoLessonProgressData> {
+    const mission = await this.prismaService.mission.findUnique({
+      where: { id: missionId },
+    });
+
+    if (!mission) {
+      throw new NotFoundException('Missão não encontrada');
+    }
+
+    if (!mission.isActive) {
+      throw new BadRequestException('Missão desabilitada');
+    }
+
+    if ((mission.challengeType as string) !== 'VIDEO_LESSON') {
+      throw new BadRequestException('Missão não é uma videoaula');
+    }
+
+    const existing = await this.prismaService.videoLessonProgress.findUnique({
+      where: { userId_missionId: { userId, missionId } },
+    });
+
+    const answeredQuestions = Array.from(
+      new Set([
+        ...(existing?.answeredQuestions ?? []),
+        ...(dto.answeredQuestions ?? []),
+      ]),
+    );
+    const xpGranted = Array.from(
+      new Set([...(existing?.xpGranted ?? []), ...(dto.xpGranted ?? [])]),
+    );
+    const bonusGranted = Boolean(existing?.bonusGranted || dto.bonusGranted);
+    const videoCompleted = Boolean(
+      existing?.videoCompleted || dto.videoCompleted,
+    );
+    const missionCompleted = Boolean(
+      existing?.missionCompleted || dto.missionCompleted,
+    );
+
+    const saved = await this.prismaService.videoLessonProgress.upsert({
+      where: { userId_missionId: { userId, missionId } },
+      create: {
+        userId,
+        missionId,
+        answeredQuestions,
+        xpGranted,
+        bonusGranted,
+        videoCompleted,
+        missionCompleted,
+      },
+      update: {
+        answeredQuestions,
+        xpGranted,
+        bonusGranted,
+        videoCompleted,
+        missionCompleted,
+      },
+    });
+
+    return {
+      answeredQuestions: saved.answeredQuestions,
+      xpGranted: saved.xpGranted,
+      bonusGranted: saved.bonusGranted,
+      videoCompleted: saved.videoCompleted,
+      missionCompleted: saved.missionCompleted,
+    };
   }
 
   private async ensureCertificateIfSurveyCompleted(
